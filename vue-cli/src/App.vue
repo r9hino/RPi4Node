@@ -8,13 +8,41 @@
 <script>
 import Modal from './components/Modal.vue'
 
+import io from 'socket.io-client'
+const socket = io('http://rpi4id0.mooo.com:5000')
+
 export default {
-  name: 'App',
+  name: "App",
   components: { Modal },
-  data(){
+  data() {
+    socket.on("connections", (data) => {
+      connections.value = data;
+      console.log(data);
+    });
+
+    socket.on("socketStaticSystemData", data => {
+      this.staticSystemData = data;
+      console.log(data);
+    });
+    
+    socket.on("socketDynamicSystemData", data => {
+      this.dynamicSystemData = data;
+      console.log(data);
+    });
+    
+    socket.on("socketAnalogValues", data => {
+      this.analogSensorValues = data;
+      console.log(data);
+    });
+
     return {
-      title: 'My first Vue app'
-    }
+      staticSystemData: {},
+      dynamicSystemData: {},
+      analogSensorValues: {},
+      test: "Hello",
+      ready: true,
+      title: 'My first Vue app',
+    };
   },
   methods: {
     handleClick() {
@@ -23,7 +51,7 @@ export default {
       this.$refs.name.focus()
     }
   }
-}
+};
 </script>
 
 <style>

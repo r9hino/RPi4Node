@@ -4,32 +4,34 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
+    <!--<link rel="icon" href="<%= BASE_URL %>favicon.ico">-->
+    <link rel="icon" href="/favicon.ico" />
+    <title>ACM</title>
+    <link rel="stylesheet" 
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+          crossorigin="anonymous">
   </head>
   <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
     <div id="app">
+      <header>
+        <nav className="navbar navbar-default navbar-dark bg-dark">
+          <nav>
+            <Link >Monitor</Link>
+            <Link >IO</Link>
+          </nav>
+        </nav>
+      </header>
       <div class="container">
         <div class="col-lg-6 offset-lg-3">
           <div v-if="ready">
-            <p v-for="(user, i) in info" :key="i">
-              {{ user.username }} {{ user.type }}
-            </p>
+
           </div>
 
           <div v-if="!ready">
             
           </div>
-          <h2 v-else>{{ username }}</h2>
+          <h2 v-else>{{ test }}</h2>
         </div>
       </div>
     </div>
@@ -37,44 +39,39 @@
     <script src="http://unpkg.com/vue@next"></script>
 
     <script>
-      const URL = "http://rpi4id0.mooo.com:3000";
-      const socket = io(URL);
+      const socket = io();
       const { createApp, ref, watch, reactive, watchEffect } = Vue;
 
       const App = {
         name: "App",
 
-        setup() {
-          let newMessage = ref(null);
-          let ready = ref(false);
-          let connections = ref(0);
-          const username = ref(null);
-
-          window.onbeforeunload = () => {
-            socket.emit("leave", username.value);
-          };
-
+        data() {
           socket.on("connections", (data) => {
             connections.value = data;
+            console.log(data);
           });
 
-          function send() {
-            messages.push({
-              message: newMessage.value,
-              type: 0,
-              user: "Me",
-            });
-
-            socket.emit("chat-message", {
-              message: newMessage.value,
-              user: username.value,
-            });
-            newMessage.value = null;
-          }
+          socket.on("socketStaticSystemData", data => {
+            this.staticSystemData = data;
+            console.log(data);
+          });
+          
+          socket.on("socketDynamicSystemData", data => {
+            this.dynamicSystemData = data;
+            console.log(data);
+          });
+          
+          socket.on("socketAnalogValues", data => {
+            this.analogSensorValues = data;
+            console.log(data);
+          });
 
           return {
-            username,
-            ready,
+            staticSystemData: {},
+            dynamicSystemData: {},
+            analogSensorValues: {},
+            test: "Hello",
+            ready: true,
           };
         },
       };

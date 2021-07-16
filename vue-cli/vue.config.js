@@ -1,8 +1,8 @@
 module.exports = {
     devServer: {// Environment configuration
         host: '0.0.0.0',
-        public:'rpi4id0.mooo.com:8000',
-        port: 8000,
+        public:'rpi4id0.mooo.com:3000',
+        port: 3000,
         https: false,
         hotOnly: false,
         disableHostCheck:true,

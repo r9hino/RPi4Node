@@ -1,11 +1,12 @@
-# vue-cli
+# modal-project
 
 ## Project setup
 ```
 npm install
 ```
-### Run the server and Vue
-node server.js
+
+### Compiles and hot-reloads for development
+```
 npm run serve
 ```
 

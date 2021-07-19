@@ -43,12 +43,12 @@
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.cpu.currentLoad : ""}}</td>
         </tr>
         <tr>
-          <td>CPU User Load</td>
-          <td>{{dynamicSystemData !== "" ? dynamicSystemData.cpu.currentLoadUser : ""}}</td>
-        </tr>
-        <tr>
           <td>CPU System Load</td>
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.cpu.currentLoadSystem : ""}}</td>
+        </tr>
+        <tr>
+          <td>CPU User Load</td>
+          <td>{{dynamicSystemData !== "" ? dynamicSystemData.cpu.currentLoadUser : ""}}</td>
         </tr>
         <tr>
           <td>Total System RAM</td>
@@ -113,8 +113,5 @@ export default {
   beforeUnmount() {
     socket.disconnect();
   },
-  beforeUpdate() {
-    //socket.disconnect();
-  }
 }
 </script>

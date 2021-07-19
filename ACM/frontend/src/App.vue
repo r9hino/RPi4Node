@@ -1,49 +1,20 @@
 <template>
-  <div id="nav">
+  <!--<div id="nav">
     <router-link to="/">Process</router-link> | 
     <router-link to="/SystemInfo">System Info</router-link> | 
     <router-link to="/about">About</router-link>
   </div>
+  -->
+  <NavBar/>
   <router-view/>
 </template>
 
 <script>
-import io from 'socket.io-client'
-const socket = io('http://rpi4id0.mooo.com:5000')
-
+import NavBar from './components/NavBar.vue'
 export default {
-  components: {},
+  components: { NavBar },
   data() {
-    socket.on("connections", (data) => {
-      connections.value = data;
-      console.log(data);
-    });
-
-    socket.on("socketStaticSystemData", data => {
-      this.staticSystemData = data;
-      //this.$router.push({name: 'SystemInfo', params: {foo: this.staticSystemData}})
-      console.log(data);
-    });
-    
-    socket.on("socketDynamicSystemData", data => {
-      this.dynamicSystemData = data;
-      //this.$router.push({name: 'SystemInfo', params: {foo: this.staticSystemData}})
-      console.log(data);
-    });
-
-    return {
-      staticSystemData: {},
-      dynamicSystemData: {}
-    };
-  },
-  beforeMount() {
-    socket.connect();
-  },
-  beforeUnmount() {
-    socket.disconnect();
-  },
-  beforeUpdate() {
-    //socket.disconnect();
+    return {}
   }
 }
 </script>

@@ -2,16 +2,15 @@
   <nav class="navbar navbar-expand-sm navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        <img src="../assets/logo128.png" alt="" width="24" height="27">
+        <img src="../assets/logo128.png" alt="" width="24" height="29">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <a class="nav-link" :class="{active: isActiveProcess}" @click="activedProcess" aria-current="page" href="#">Process</a>
-          <a class="nav-link" :class="{active: isActiveCalibration}" @click="activedCalibration" href="#">Calibration</a>
-          <a class="nav-link" :class="{active: isActiveSystemInfo}" @click="activedSystemInfo" href="#">System info</a>
+          <router-link to="/">Process</router-link>
+          <router-link to="/SystemInfo">System Info</router-link>
         </ul>
       </div>
     </div>
@@ -20,6 +19,7 @@
 
 <script>
 export default {
+    name: "NavBar",
     data() {
         return{
             isActiveProcess: true,

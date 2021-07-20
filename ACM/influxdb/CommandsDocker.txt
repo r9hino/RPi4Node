@@ -1,0 +1,45 @@
+Install docker:
+sudo apt install docker.io
+sudo apt install docker-compose
+
+Run docker without sudo (https://docs.docker.com/engine/install/linux-postinstall/):
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker --version
+
+docker run redis // Run create a new container from an image.
+docker run -d redis // Return to prompt.
+docker run -d -p6000:6379 --name redis-old redis:4.0
+
+// Listing.
+docker ps // Containers in execution.
+docker ps -a // Containers in execution or not.
+docker images // Applications on containers.
+docker volume ls
+docker network ls
+docker logs "Id container or NAMES"
+
+docker network create mongo-network
+
+docker stop "ID container"
+docker star "ID container" // Start an already created container.
+
+// Remove containers.
+docker rm -v "NAMES"  // -v is for removing volumes of that container.
+// Remove images.
+docker rmi "REPOSITORY:TAG"
+// Remove volumes
+docker volume rm "NAMES in docker volume ls"
+docker volume prune // Remove al unused volumes.
+
+
+
+sudo docker-compose up
+sudo docker-compose down -v
+
+sudo docker ps -a
+
+sudo docker exec -it a0aab004ca1a  bash
+
+docker run -v /local/folder:/vitual/folder

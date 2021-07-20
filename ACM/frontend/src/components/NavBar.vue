@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-sm navbar-custom">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">
-        <img src="../assets/logo128.png" alt="" width="24" height="29">
+        <img src="../assets/logo128.png" alt="" width="24" height="30">
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -49,12 +49,17 @@ export default {
 </script>
 
 <style>
+.navbar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: 45px !important;
+}
 .navbar-custom {
-    background-color: #e8e8e8;
-    border-color: #c7c7c7;
+    background-color: #ddd;
+    border-color: #c0c0c0;
 }
 .routerLink{
-  margin: 0px 10px;
+  padding: 0px 10px;
   color: #505050;
   font-weight: bold;
   text-decoration: none;

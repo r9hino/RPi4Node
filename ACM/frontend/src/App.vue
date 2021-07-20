@@ -1,10 +1,4 @@
 <template>
-  <!--<div id="nav">
-    <router-link to="/">Process</router-link> | 
-    <router-link to="/SystemInfo">System Info</router-link> | 
-    <router-link to="/about">About</router-link>
-  </div>
-  -->
   <NavBar/>
   <router-view/>
 </template>

@@ -1,3 +1,4 @@
+// Configuration --------------------------------------------------------------------------------------------
 Install docker:
 sudo apt install docker.io
 sudo apt install docker-compose
@@ -8,6 +9,8 @@ sudo usermod -aG docker $USER
 newgrp docker
 docker --version
 
+
+// Commands --------------------------------------------------------------------------------------------------
 docker run redis // Run create a new container from an image.
 docker run -d redis // Return to prompt.
 docker run -d -p6000:6379 --name redis-old redis:4.0

@@ -37,12 +37,14 @@ docker volume rm "NAMES in docker volume ls"
 docker volume prune // Remove al unused volumes.
 
 
-
+// Docker compose commands -----------------------------------------------------------------------------------
 sudo docker-compose up
 sudo docker-compose down -v
 
-sudo docker ps -a
+docker-compose -f docker-mongo.yml up
+docker-compose -f docker-mongo.yml down
 
+sudo docker ps -a
 sudo docker exec -it a0aab004ca1a  bash
 
 docker run -v /local/folder:/vitual/folder

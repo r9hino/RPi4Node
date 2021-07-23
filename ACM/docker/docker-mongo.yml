@@ -1,3 +1,7 @@
+# Commandos docker:
+# docker network create docker_default
+# docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=userchange -e MONGO_INITDB_ROOT_PASSWORD=passchange --name mongo-latest --network docker_default mongo:latest
+# docker run -d -p 8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=userchange -e ME_CONFIG_MONGODB_ADMINPASSWORD=passchange --net mongo-network --name mongo-express -e ME_CONFIG_MONGODB_SERVER=mongo-4.4.7 mongo-express
 version: '3.3'
 services:
     mongo:
@@ -10,5 +14,11 @@ services:
     mongo-express:
         image: mongo-express
         restart: always
+        depends_on:
+            - mongo
         ports:
- 
+            - 8081:8081
+        environment:
+            - ME_CONFIG_MONGODB_ADMINUSERNAME=userchange
+            - ME_CONFIG_MONGODB_ADMINPASSWORD=passchange
+            - ME_CONFIG_MONGODB_SERVER=mongo

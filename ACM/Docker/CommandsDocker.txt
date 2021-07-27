@@ -47,4 +47,4 @@ docker-compose -f docker-mongo.yml down
 sudo docker ps -a
 sudo docker exec -it a0aab004ca1a  bash
 
-docker run -v /local/folder:/vitual/folder
+docker run -v /local/folder:/virtual/folder

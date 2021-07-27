@@ -9,7 +9,6 @@ const port = process.env.PORT || 5000;
 const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
 
-
 // Bone: AIN -> P9_39: A0    P9_40: A1    P9_37: A2    P9_38: A3    P9_33: A4    P9_36: A5     P9_35: A6
 const inAnalogA3 = "A3";
 const inAnalogA4 = "A4";

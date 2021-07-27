@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    restart: always
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDBUSER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDBPASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=SET 
+      - DOCKER_INFLUXDB_INIT_BUCKET=SET-bucket
+
+volumes:
+    influxdb-storage:

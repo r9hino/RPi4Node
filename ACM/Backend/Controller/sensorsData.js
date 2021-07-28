@@ -1,12 +1,17 @@
+const ClassI2C = require('./I2CHandler');
+
+const addressMPU6050 = 0x68;
+const i2cbus = 1;
+const classI2C = new ClassI2C(i2cbus, addressMPU6050);
 
 const getSensorData = async () => {
-    const valueAnalogA3 = 1.1;
+    const temperature = classI2C.readTempSync();
     const valueAnalogA4 = 2.2;
     const valueAnalogA5 = 3.3;
     const valueAnalogA6 = 4.4;
 
     return {
-            "analogA3": (valueAnalogA3*100).toFixed(1) + '%  ' + (1.8*valueAnalogA3).toFixed(3) + 'V',
+            "temperature": temperature.toFixed(1),
             "analogA4": (valueAnalogA4*100).toFixed(1) + '%  ' + (1.8*valueAnalogA4).toFixed(3) + 'V',
             "analogA5": (valueAnalogA5*100).toFixed(1) + '%  ' + (1.8*valueAnalogA5).toFixed(3) + 'V',
             "analogA6": (valueAnalogA6*100).toFixed(1) + '%  ' + (1.8*valueAnalogA6).toFixed(3) + 'V'
@@ -15,15 +20,3 @@ const getSensorData = async () => {
 
 module.exports.getSensorData = getSensorData;
 
-
-/*const ADS1115 = require('ads1115');
- 
-ADS1115.open(1, 0x48, 'i2c-bus').then(async (ads1115) => {
-  ads1115.gain = 1
- 
-  for (let i = 0; i < 20; i++) {
-    let x = await ads1115.measure('0+GND')
-    let y = await ads1115.measure('1+GND')
-    console.log("ADC0: " + x + "   ADC1: " + y)
-  }
-})*/

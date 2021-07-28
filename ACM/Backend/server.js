@@ -6,14 +6,14 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+
 const systemData = require('./Controller/systemData');
 const sensorsData = require('./Controller/sensorsData');
-
 const influx = require('./DB/dbclient');
 const influxAPI = influx.dbInitialization();
 
-const app = express();
 
+const app = express();
 const port = process.env.SOCKETIO_PORT;
 const httpServer = http.createServer(app)
                        .listen(port, () => console.log(`Listening on port ${port}`));
@@ -36,15 +36,24 @@ io.on("connection", (socket) => {
                   .then(data => {
                       io.emit('socketDynamicSystemData', data);
                       influx.writeData(influxAPI, 'memory', '%', data.memoryRAM.active);
-                  });
+                   });
         // Promise with the sensor data.
         sensorsData.getSensorData()
-                   .then(data => io.emit('socketAnalogValues', data));
+                   .then(data => {
+                       io.emit('socketAnalogValues', data);
+                       influx.writeData(influxAPI, 'temperature', '°C', data.temperature);
+                    });
     }, 1000);
     
     socket.on("disconnect", () => {
         console.log(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
         if(io.engine.clientsCount === 0) clearInterval(dataInterval);
-        influx.closeClient(influxAPI);
     });
 });
+
+process.on('SIGTERM', () => {
+    influx.closeClient(influxAPI);
+    httpServer.close(() => {
+        console.log('HTTP server process terminated.')
+    })
+})

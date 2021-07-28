@@ -9,6 +9,7 @@ const org = process.env.INFLUXDB_ORG;
 const bucket = process.env.INFLUXDB_BUCKET;
 const port = process.env.INFLUXDB_PORT;
 
+// Initialize Influx DB client and return API object to communicate with the DB.
 const dbInitialization = () => {
     const client = new InfluxDB({url: `${url}:${port}`, token: token});
     console.log(`Connected to Influx DB: ${url}:${port}`);

@@ -1,28 +1,48 @@
+require('dotenv').config({path: __dirname + '/../.env'});
 const {InfluxDB, Point} = require('@influxdata/influxdb-client');
-const {hostname} = require('os')
-
+const {hostname} = require('os');
 
 // Influx DB client.
-const token = 'hYwmUEp7UlvcpaF9-vcZHSXW-YfynoKMO915cb60XH3JVFjcuZApRHM3AyamX43fhndjBkXxd8jOkVSM3ZJjSQ=='
-const org = 'SET'
-const bucket = 'SET-bucket'
-const client = new InfluxDB({url: 'http://rpi4id0.mooo.com:8086', token: token})
+const url = process.env.INFLUXDB_URL;
+const token = process.env.INFLUXDB_TOKEN;
+const org = process.env.INFLUXDB_ORG;
+const bucket = process.env.INFLUXDB_BUCKET;
+const port = process.env.INFLUXDB_PORT;
+
+const dbInitialization = () => {
+    const client = new InfluxDB({url: `${url}:${port}`, token: token});
+    console.log(`Connected to Influx DB: ${url}:${port}`);
+    
+    const writeAPI = client.getWriteApi(org, bucket);
+    writeAPI.useDefaultTags({host: hostname()});
+
+    return writeAPI;
+}
 
 
-const writeApi = client.getWriteApi(org, bucket);
-writeApi.useDefaultTags({host: hostname()});
+//writeData('temperature', '°C', 22.5);
+// Inject data to influx DB.
+// Inputs: sensorType is a string (temperature, pressure, pH)
+//         sensorUnit is a string (m, pa, °C)
+//         sensorValue is a float (32.2 30.0)
+const writeData = (writeAPI, sensorType, sensorUnit, sensorValue) => {
+    const point = new Point(sensorType)
+                        .floatField(sensorUnit, sensorValue);
 
-function writeData(sensor, sensorValue, sensorUnit){
-    const point = new Point(sensor).floatField(sensorUnit, sensorValue);
+    writeAPI.writePoint(point);
+    
+}
 
-    writeApi.writePoint(point);
-    writeApi.close()
+const closeClient = (writeAPI) => {
+    writeAPI.close()
         .then(() => {
-            console.log('FINISHED');
+            console.log('Closing database connection.');
         })
         .catch(e => {
             console.error(e);
-            console.log('\\nFinished ERROR');
+            console.log('Error.');
         });
 }
-
+module.exports.dbInitialization = dbInitialization;
+module.exports.writeData = writeData;
+module.exports.closeClient = closeClient;

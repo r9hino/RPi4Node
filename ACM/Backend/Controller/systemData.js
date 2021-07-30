@@ -33,7 +33,7 @@ const getDynamicData = async () => {
     try {
         let [time, cpu, memoryRAM, memoryDisk] = await Promise.all([si.time(), si.currentLoad(), si.mem(), si.fsSize()]);
         memoryDisk = memoryDisk[0];
-        
+
         const dynamicSystemData = {};
 
         dynamicSystemData.time = {
@@ -43,11 +43,11 @@ const getDynamicData = async () => {
         };
         
         dynamicSystemData.cpu = {
-            currentLoad: cpu.currentLoad.toFixed(1) + "%",
-            currentLoadUser: cpu.currentLoadUser.toFixed(1) + "%",
-            currentLoadSystem: cpu.currentLoadSystem.toFixed(1) + "%"
+            currentLoad: cpu.currentLoad == undefined ? null : cpu.currentLoad.toFixed(1) + "%",
+            currentLoadUser: cpu.currentLoadUser == undefined ? null : cpu.currentLoadUser.toFixed(1) + "%",
+            currentLoadSystem: cpu.currentLoadSystem == undefined ? null : cpu.currentLoadSystem.toFixed(1) + "%"
         };
-        
+
         dynamicSystemData.memoryRAM = {
             total: (memoryRAM.total/1024/1024).toFixed(1),
             active: (memoryRAM.active/1024/1024).toFixed(1),

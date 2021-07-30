@@ -1,11 +1,11 @@
-const ClassI2C = require('./I2CHandler');
+const I2CHandler = require('./I2CHandler');
 
 const addressMPU6050 = 0x68;
 const i2cbus = 1;
-const classI2C = new ClassI2C(i2cbus, addressMPU6050);
+const i2c = new I2CHandler(i2cbus, addressMPU6050);
 
 const getSensorData = async () => {
-    const temperature = classI2C.readTempSync();
+    const temperature = i2c.readTempSync();
     const valueAnalogA4 = 2.2;
     const valueAnalogA5 = 3.3;
     const valueAnalogA6 = 4.4;

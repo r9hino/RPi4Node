@@ -21,17 +21,17 @@ const dbInitialization = () => {
 }
 
 
-//writeData('temperature', '°C', 22.5);
+// Write data to Influx DB.
+// Example: writeData('temperature', '°C', 22.5);
 // Inject data to influx DB.
-// Inputs: sensorType is a string (temperature, pressure, pH)
-//         sensorUnit is a string (m, pa, °C)
-//         sensorValue is a float (32.2 30.0)
+// Inputs: string -> sensorType = temperature, pressure, pH
+//         string -> sensorUnit = m, pa, °C
+//         float  -> sensorValue
 const writeData = (writeAPI, sensorType, sensorUnit, sensorValue) => {
     const point = new Point(sensorType)
                         .floatField(sensorUnit, sensorValue);
 
     writeAPI.writePoint(point);
-    
 }
 
 const closeClient = (writeAPI) => {
@@ -44,6 +44,7 @@ const closeClient = (writeAPI) => {
             console.log('Error.');
         });
 }
+
 module.exports.dbInitialization = dbInitialization;
 module.exports.writeData = writeData;
 module.exports.closeClient = closeClient;

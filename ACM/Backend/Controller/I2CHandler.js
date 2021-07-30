@@ -6,12 +6,12 @@ const POWER_MGMT_1 = 0x6b,
       TEMP_OUT     = 0x41;
 
 class I2CHandler {
-    constructor(busNumber, address) {
+    constructor(i2cBusNumber, address) {
         if (!(this instanceof I2CHandler)) {
-            return new I2CHandler(busNumber, address);
+            return new I2CHandler(i2cBusNumber, address);
         }
 
-        this.bus = i2c.openSync(busNumber);;
+        this.bus = i2c.openSync(i2cBusNumber);;
         this.address = address;
         this.calibration = {};
 

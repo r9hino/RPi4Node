@@ -1,4 +1,4 @@
-// Good links:
+// Links:
 // Promise - async/await: https://blog.risingstack.com/mastering-async-await-in-nodejs/
 
 require('dotenv').config();
@@ -9,9 +9,19 @@ const socketio = require('socket.io');
 
 const systemData = require('./Controller/systemData');
 const sensorsData = require('./Controller/sensorsData');
+const SensorMonitor = require('./Controller/SensorMonitor');
 const influx = require('./DB/dbclient');
 const influxAPI = influx.dbInitialization();
 
+
+// Sensor retrieving functions.
+let temperatureRetriever = async () => {
+    let data = await sensorsData.getSensorData();
+    //console.log('Temperature retrieved: ', data.temperature);
+    return data.temperature;
+};
+// Sensors initialization
+let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 10, temperatureRetriever);
 
 const app = express();
 const port = process.env.SOCKETIO_PORT;
@@ -19,8 +29,21 @@ const httpServer = http.createServer(app)
                        .listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
 
-let dataInterval;
+// Data injection intervals to Influx DB.
+let fiveSecInterval = setInterval(async () => {
+    let dynamicData = await systemData.getDynamicData();
+    influx.writeData(influxAPI, 'memory', '%', dynamicData.memoryRAM.active);
+    console.log('Memory data injected.');
+}, 1000*5);
 
+let minuteInterval = setInterval(async () => {
+    console.log('Temp is ', temperatureSensor.values);
+    influx.writeData(influxAPI, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
+}, 1000*60);
+
+
+// Send data through sockets.
+let dataInterval;
 io.on("connection", (socket) => {
     console.log(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
 
@@ -33,15 +56,12 @@ io.on("connection", (socket) => {
     dataInterval = setInterval(() => {
         // Promise with the dynamic system data.
         systemData.getDynamicData()
-                  .then(data => {
-                      io.emit('socketDynamicSystemData', data);
-                      influx.writeData(influxAPI, 'memory', '%', data.memoryRAM.active);
-                   });
+                  .then(/*data => io.emit('socketDynamicSystemData', data)*/);
         // Promise with the sensor data.
         sensorsData.getSensorData()
                    .then(data => {
                        io.emit('socketAnalogValues', data);
-                       influx.writeData(influxAPI, 'temperature', '°C', data.temperature);
+                       //influx.writeData(influxAPI, 'temperature', '°C', data.temperature);
                     });
     }, 1000);
     

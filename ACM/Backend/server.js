@@ -1,5 +1,6 @@
 // Links:
 // Promise - async/await: https://blog.risingstack.com/mastering-async-await-in-nodejs/
+// Class: https://javascript.info/class#not-just-a-syntactic-sugar
 
 require('dotenv').config();
 
@@ -7,35 +8,43 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 
+const I2CHandler = require('./Controller/I2CHandler');
 const systemData = require('./Controller/systemData');
-const sensorsData = require('./Controller/sensorsData');
 const SensorMonitor = require('./Controller/SensorMonitor');
 const influx = require('./DB/dbclient');
-const influxAPI = influx.dbInitialization();
-
-
-// Sensor retrieving functions.
-let temperatureRetriever = async () => {
-    //console.log('Temperature retrieved: ', data.temperature);
-    return await sensorsData.getTemperature();
-};
-// Sensors initialization
-let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 10, temperatureRetriever);
 
 const app = express();
 const port = process.env.SOCKETIO_PORT;
 const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
+const influxAPI = influx.dbInitialization();
+const i2c = new I2CHandler();
+
+// Sensor retrieving functions.
+let temperatureRetriever = async () => {
+    //console.log('Temperature retrieved: ', data.temperature);
+    return await i2c.readTempSync();
+};
+let analogRetriever = async () => {
+    //console.log('Temperature retrieved: ', data.temperature);
+    return await i2c.readAnalog();
+};
+
+// Sensors monitoring initialization
+let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 20, temperatureRetriever);
+let analogSensor = new SensorMonitor('Voltage', 'V', 1000*1, 10, analogRetriever);
 
 // Data injection intervals to Influx DB.
 let fiveSecInterval = setInterval(async () => {
     let dynamicData = await systemData.getDynamicData();
     influx.writeData(influxAPI, 'memory', '%', dynamicData.memoryRAM.active);
     console.log('Memory data injected.');
+
+    console.log('Analog average is:', analogSensor.average(), analogSensor.values);
 }, 1000*5);
 
 let minuteInterval = setInterval(async () => {
-    console.log('Temp is ', temperatureSensor.values);
+    console.log('Temperature average is:', temperatureSensor.average(), temperatureSensor.values);
     influx.writeData(influxAPI, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
 }, 1000*60);
 
@@ -56,13 +65,15 @@ io.on("connection", (socket) => {
         systemData.getDynamicData()
                   .then(/*data => io.emit('socketDynamicSystemData', data)*/);
         // Promise with the sensor data.
-        sensorsData.getSensorData()
-                   .then(data => {
-                       io.emit('socketAnalogValues', data);
-                       //influx.writeData(influxAPI, 'temperature', '°C', data.temperature);
-                    });
+
+        let analogData = {
+            analog0: analogSensor.average(),
+            temperature: temperatureSensor.average()
+        };
+
+        io.emit('socketAnalogValues', analogData);
     }, 1000);
-    
+
     socket.on("disconnect", () => {
         console.log(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
         if(io.engine.clientsCount === 0) clearInterval(dataInterval);

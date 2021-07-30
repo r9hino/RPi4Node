@@ -34,6 +34,7 @@ class SensorMonitor {
     }
 
     average(){
+        // If there aren't elements on the array, then do nothing.
         if(this.values.length == 0) return null;
 
         // First clean the array from undefined, null or "" values.

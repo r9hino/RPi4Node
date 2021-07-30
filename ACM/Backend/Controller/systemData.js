@@ -41,7 +41,7 @@ const getDynamicData = async () => {
             uptime: new Date(time.uptime*1000).toISOString().substr(11, 8),
             timezone: time.timezone
         };
-        
+
         dynamicSystemData.cpu = {
             currentLoad: cpu.currentLoad == undefined ? null : cpu.currentLoad.toFixed(1) + "%",
             currentLoadUser: cpu.currentLoadUser == undefined ? null : cpu.currentLoadUser.toFixed(1) + "%",
@@ -54,7 +54,7 @@ const getDynamicData = async () => {
             used: (memoryRAM.used/1024/1024).toFixed(1),
             activePercent: (100*memoryRAM.active/memoryRAM.total).toFixed(1) + "%"
         };
-        
+
         dynamicSystemData.memoryDisk = {
             total: (memoryDisk.size/1024/1024).toFixed(1),
             used: (memoryDisk.used/1024/1024).toFixed(1),

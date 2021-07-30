@@ -28,8 +28,7 @@ const dbInitialization = () => {
 //         string -> sensorUnit = m, pa, °C
 //         float  -> sensorValue
 const writeData = (writeAPI, sensorType, sensorUnit, sensorValue) => {
-    const point = new Point(sensorType)
-                        .floatField(sensorUnit, sensorValue);
+    const point = new Point(sensorType).floatField(sensorUnit, sensorValue);
 
     writeAPI.writePoint(point);
 }

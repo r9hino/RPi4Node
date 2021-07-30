@@ -1,6 +1,8 @@
 // Class for storing each sensor setup.
 // Constructor inputs:
 //      sensorRetriever is a function whose job is to retrieve the data from the sensor.
+// Properties:
+//      interval set a fixed time execution of the sensorRetrieve function.
 class SensorMonitor {
     constructor(sensorType, unit, retrieveTime, maxArrayElements, sensorRetriever) {
 

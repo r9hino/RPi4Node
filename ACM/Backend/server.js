@@ -16,17 +16,15 @@ const influxAPI = influx.dbInitialization();
 
 // Sensor retrieving functions.
 let temperatureRetriever = async () => {
-    let data = await sensorsData.getSensorData();
     //console.log('Temperature retrieved: ', data.temperature);
-    return data.temperature;
+    return await sensorsData.getTemperature();
 };
 // Sensors initialization
 let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 10, temperatureRetriever);
 
 const app = express();
 const port = process.env.SOCKETIO_PORT;
-const httpServer = http.createServer(app)
-                       .listen(port, () => console.log(`Listening on port ${port}`));
+const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
 
 // Data injection intervals to Influx DB.

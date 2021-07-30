@@ -18,5 +18,11 @@ const getSensorData = async () => {
     };
 };
 
+const getTemperature = async () => {
+    const temperature = i2c.readTempSync();
+    return temperature.toFixed(1);
+};
+
 module.exports.getSensorData = getSensorData;
+module.exports.getTemperature = getTemperature;
 

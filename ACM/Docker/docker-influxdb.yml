@@ -1,20 +1,29 @@
-version: '3.3'
+# Creating a network first: docker network create --driver bridge influxdb2-telegraf-net
+
+version: '3.5'
 
 services:
-  influxdb:
+  influxdb2:
     image: influxdb:latest
-    container_name: influxdb
+    container_name: influxdb2
     restart: always
     ports:
       - 8086:8086
     volumes:
-      - influxdb-storage:/var/lib/influxdb
+      - type: bind
+        source: /home/pi/Code/RPi4Node/ACM/Docker/influxdb2/data
+        target: /var/lib/influxdb2
+      - type: bind
+        source: /home/pi/Code/RPi4Node/ACM/Docker/influxdb2/config
+        target: /etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDBUSER}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDBPASSWORD}
       - DOCKER_INFLUXDB_INIT_ORG=SET 
-      - DOCKER_INFLUXDB_INIT_BUCKET=SET-bucket
+      - DOCKER_INFLUXDB_INIT_BUCKET=rpi-os
 
-volumes:
-    influxdb-storage:
+networks:
+  default:
+    external: true
+    name: influxdb2-telegraf-net

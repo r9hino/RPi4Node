@@ -39,9 +39,9 @@ let analogSensor = new SensorMonitor('Voltage', 'V', 1000*1, 10, analogRetriever
 // Intervals for data injection to Influx DB.
 let tenSecInterval = setInterval(async () => {
     let dynamicData = await systemData.getDynamicData();
-    influxHandler.writeData(influxOSAPI, 'memory', '%', dynamicData.memoryRAM.active);
-    influxHandler.writeData(influxOSAPI, 'cpu', '%', dynamicData.cpu.currentLoad);
-    console.log('Memory data injected.');
+    //influxHandler.writeData(influxOSAPI, 'memory', '%', dynamicData.memoryRAM.active);
+    //influxHandler.writeData(influxOSAPI, 'cpu', '%', dynamicData.cpu.currentLoad);
+    //console.log('Memory data injected.');
 
     console.log('Analog average is:', analogSensor.average());
 }, 1000*10);

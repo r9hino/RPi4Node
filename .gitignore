@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 /dist
+/ACM/Docker/influxdb2/
 
 
 # env files

@@ -6,15 +6,16 @@ const {hostname} = require('os');
 const url = process.env.INFLUXDB_URL;
 const token = process.env.INFLUXDB_TOKEN;
 const org = process.env.INFLUXDB_ORG;
-const bucket = process.env.INFLUXDB_BUCKET;
+//const bucket = process.env.INFLUXDB_BUCKET;
 const port = process.env.INFLUXDB_PORT;
 
 // Initialize Influx DB client and return API object to communicate with the DB.
-const dbInitialization = () => {
+const initDBAPI = (bucket) => {
     const client = new InfluxDB({url: `${url}:${port}`, token: token});
-    console.log(`Connected to Influx DB: ${url}:${port}`);
+    //console.log(`Connected to Influx DB: ${url}:${port}`);
     
     const writeAPI = client.getWriteApi(org, bucket);
+    console.log(`Influx ${bucket} bucket API available.`);
     writeAPI.useDefaultTags({host: hostname()});
 
     return writeAPI;
@@ -44,6 +45,6 @@ const closeClient = (writeAPI) => {
         });
 }
 
-module.exports.dbInitialization = dbInitialization;
+module.exports.initDBAPI = initDBAPI;
 module.exports.writeData = writeData;
 module.exports.closeClient = closeClient;

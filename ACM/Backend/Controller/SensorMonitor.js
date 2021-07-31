@@ -12,7 +12,7 @@ class SensorMonitor {
         this.maxArrayElements = maxArrayElements;
         this.value = null;                          // Store last value from sensor.
         this.values = [];                           // Store last maxArrayElements values from sensor.
-        
+
         // Values from sensor are stored in arrays.
         this.sensorRetriever = async () => {
             this.value = await sensorRetriever();

@@ -11,13 +11,15 @@ const socketio = require('socket.io');
 const I2CHandler = require('./Controller/I2CHandler');
 const systemData = require('./Controller/systemData');
 const SensorMonitor = require('./Controller/SensorMonitor');
-const influx = require('./DB/dbclient');
+const influxHandler = require('./DB/dbInfluxHanlder');
 
 const app = express();
 const port = process.env.SOCKETIO_PORT;
 const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
-const influxAPI = influx.dbInitialization();
+
+const influxSensorAPI = influxHandler.initDBAPI('rpi-sensors');
+const influxOSAPI = influxHandler.initDBAPI('rpi-os');
 const i2c = new I2CHandler();
 
 // Sensor retrieving functions.
@@ -34,18 +36,19 @@ let analogRetriever = async () => {
 let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 20, temperatureRetriever);
 let analogSensor = new SensorMonitor('Voltage', 'V', 1000*1, 10, analogRetriever);
 
-// Data injection intervals to Influx DB.
-let fiveSecInterval = setInterval(async () => {
+// Intervals for data injection to Influx DB.
+let tenSecInterval = setInterval(async () => {
     let dynamicData = await systemData.getDynamicData();
-    influx.writeData(influxAPI, 'memory', '%', dynamicData.memoryRAM.active);
+    influxHandler.writeData(influxOSAPI, 'memory', '%', dynamicData.memoryRAM.active);
+    influxHandler.writeData(influxOSAPI, 'cpu', '%', dynamicData.cpu.currentLoad);
     console.log('Memory data injected.');
 
-    console.log('Analog average is:', analogSensor.average(), analogSensor.values);
-}, 1000*5);
+    console.log('Analog average is:', analogSensor.average());
+}, 1000*10);
 
 let minuteInterval = setInterval(async () => {
     console.log('Temperature average is:', temperatureSensor.average(), temperatureSensor.values);
-    influx.writeData(influxAPI, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
+    influxHandler.writeData(influxSensorAPI, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
 }, 1000*60);
 
 

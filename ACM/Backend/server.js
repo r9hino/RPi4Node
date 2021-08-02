@@ -3,6 +3,12 @@
 // Class: https://javascript.info/class#not-just-a-syntactic-sugar
 
 require('dotenv').config();
+const url = process.env.INFLUXDB_URL;
+const token = process.env.INFLUXDB_TOKEN;
+const influxPort = process.env.INFLUXDB_PORT;
+const org = process.env.INFLUXDB_ORG;
+const sensorBucket = process.env.INFLUXDB_SENSORS_BUCKET;
+
 
 const express = require('express');
 const http = require('http');
@@ -11,16 +17,15 @@ const socketio = require('socket.io');
 const I2CHandler = require('./Controller/I2CHandler');
 const systemData = require('./Controller/systemData');
 const SensorMonitor = require('./Controller/SensorMonitor');
-const influxHandler = require('./DB/dbInfluxHanlder');
+const InfluxDBHandler = require('./DB/InfluxDBHandler');
 
 const app = express();
 const port = process.env.SOCKETIO_PORT;
 const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
 const io = socketio(httpServer, {cors: true});
 
-const influxSensorAPI = influxHandler.initDBAPI('rpi-sensors');
-const influxOSAPI = influxHandler.initDBAPI('rpi-os');
 const i2c = new I2CHandler();
+const localInfluxDB = new InfluxDBHandler(url, influxPort, token, org, sensorBucket);
 
 // Sensor retrieving functions.
 let temperatureRetriever = async () => {
@@ -48,8 +53,8 @@ let tenSecInterval = setInterval(async () => {
 
 let minuteInterval = setInterval(async () => {
     console.log('Temperature average is:', temperatureSensor.average(), temperatureSensor.values);
-    influxHandler.writeData(influxSensorAPI, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
-}, 1000*60);
+    localInfluxDB.writeData(sensorBucket, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
+}, 1000*15);
 
 
 // Send data through sockets.

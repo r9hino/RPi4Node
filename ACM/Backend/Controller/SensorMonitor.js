@@ -4,7 +4,7 @@
 // Properties:
 //      interval set a fixed time execution of the sensorRetrieve function.
 class SensorMonitor {
-    constructor(sensorType, unit, retrieveTime, maxArrayElements, sensorRetriever) {
+    constructor(sensorType, unit, retrieveTime, maxArrayElements, sensorRetriever){
 
         this.sensorType = sensorType;
         this.unit = unit;

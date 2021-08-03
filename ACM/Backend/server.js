@@ -8,6 +8,8 @@ const token = process.env.INFLUXDB_TOKEN;
 const influxPort = process.env.INFLUXDB_PORT;
 const org = process.env.INFLUXDB_ORG;
 const sensorBucket = process.env.INFLUXDB_SENSORS_BUCKET;
+const systemBucket = process.env.INFLUXDB_SYSTEM_BUCKET;
+const socketioPort = process.env.SOCKETIO_PORT;
 
 
 const express = require('express');
@@ -20,41 +22,40 @@ const SensorMonitor = require('./Controller/SensorMonitor');
 const InfluxDBHandler = require('./DB/InfluxDBHandler');
 
 const app = express();
-const port = process.env.SOCKETIO_PORT;
-const httpServer = http.createServer(app).listen(port, () => console.log(`Listening on port ${port}`));
+const httpServer = http.createServer(app).listen(socketioPort, () => console.log(`HTTP server for socket.io is listening on port ${socketioPort}`));
 const io = socketio(httpServer, {cors: true});
 
 const i2c = new I2CHandler();
-const localInfluxDB = new InfluxDBHandler(url, influxPort, token, org, sensorBucket);
+const localInfluxDB = new InfluxDBHandler(url, influxPort, token, org, [sensorBucket, systemBucket]);
 
 // Sensor retrieving functions.
-let temperatureRetriever = async () => {
-    //console.log('Temperature retrieved: ', data.temperature);
-    return await i2c.readTempSync();
-};
-let analogRetriever = async () => {
-    //console.log('Temperature retrieved: ', data.temperature);
-    return await i2c.readAnalog();
-};
+let temperatureRetriever = async () => await i2c.readTempSync();
+let analogRetriever = async () => await i2c.readAnalog();
 
 // Sensors monitoring initialization
 let temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 20, temperatureRetriever);
-let analogSensor = new SensorMonitor('Voltage', 'V', 1000*1, 10, analogRetriever);
+let analogSensor = new SensorMonitor('voltage', 'V', 1000*1, 10, analogRetriever);
 
 // Intervals for data injection to Influx DB.
 let tenSecInterval = setInterval(async () => {
     let dynamicData = await systemData.getDynamicData();
-    //influxHandler.writeData(influxOSAPI, 'memory', '%', dynamicData.memoryRAM.active);
-    //influxHandler.writeData(influxOSAPI, 'cpu', '%', dynamicData.cpu.currentLoad);
+    console.log(dynamicData.memoryRAM.activePercent, dynamicData.memoryDisk.usedPercent, dynamicData.cpu.currentLoad);
+    if(dynamicData.memoryRAM.activePercent !== null) localInfluxDB.writeData(systemBucket, 'active-ram', '%', dynamicData.memoryRAM.activePercent);
+    if(dynamicData.memoryDisk.usedPercent !== null)  localInfluxDB.writeData(systemBucket, 'used-disk', '%', dynamicData.memoryDisk.usedPercent);
+    if(dynamicData.cpu.currentLoad !== null) localInfluxDB.writeData(systemBucket, 'cpu', '%', dynamicData.cpu.currentLoad);
+    //console.log(localInfluxDB.writeAPI[systemBucket].retryBuffer);
     //console.log('Memory data injected.');
 
-    console.log('Analog average is:', analogSensor.average());
+    //console.log('Analog average is:', analogSensor.average());
 }, 1000*10);
 
 let minuteInterval = setInterval(async () => {
     console.log('Temperature average is:', temperatureSensor.average(), temperatureSensor.values);
     localInfluxDB.writeData(sensorBucket, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
-}, 1000*15);
+    //console.log(localInfluxDB.writeAPI[sensorBucket].writeBuffer);
+    //console.log(localInfluxDB.writeAPI[sensorBucket].retryBuffer);
+
+}, 1000*10);
 
 
 // Send data through sockets.
@@ -88,9 +89,28 @@ io.on("connection", (socket) => {
     });
 });
 
-process.on('SIGTERM', () => {
-    influx.closeClient(influxAPI);
-    httpServer.close(() => {
-        console.log('HTTP server process terminated.')
-    })
-})
+async function onShutdown(){
+    console.log("The server is closing...");
+    clearInterval(tenSecInterval);
+    clearInterval(minuteInterval);
+    clearInterval(dataInterval);
+
+    try {
+        await localInfluxDB.closeClient([sensorBucket, systemBucket]);
+        
+        io.close(() => {
+            console.log('Socket.io closed...');
+            httpServer.close(() => {
+                console.log('HTTP server process terminated...')
+                process.exit(0);
+            });
+        });
+    }
+    catch(error){
+        console.log('Error: ', error);
+        process.exit(0);
+    }
+}
+
+process.on('SIGTERM', onShutdown);
+process.on('SIGINT', onShutdown);

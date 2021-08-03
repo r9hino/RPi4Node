@@ -31,7 +31,10 @@ const getStaticData = async () => {
 
 const getDynamicData = async () => {
     try {
-        let [time, cpu, memoryRAM, memoryDisk] = await Promise.all([si.time(), si.currentLoad(), si.mem(), si.fsSize()]);
+        let time = await si.time();
+        let cpu = await si.currentLoad();
+        let memoryRAM = await si.mem();
+        let memoryDisk = await si.fsSize();
         memoryDisk = memoryDisk[0];
 
         const dynamicSystemData = {};
@@ -49,16 +52,16 @@ const getDynamicData = async () => {
         };
 
         dynamicSystemData.memoryRAM = {
-            total: (memoryRAM.total/1024/1024).toFixed(1),
-            active: (memoryRAM.active/1024/1024).toFixed(1),
-            used: (memoryRAM.used/1024/1024).toFixed(1),
-            activePercent: (100*memoryRAM.active/memoryRAM.total).toFixed(1) + "%"
+            total: memoryRAM.total == undefined ? null : (memoryRAM.total/1024/1024).toFixed(1),
+            active: memoryRAM.active  == undefined ? null : (memoryRAM.active/1024/1024).toFixed(1),
+            used: memoryRAM.used  == undefined ? null : (memoryRAM.used/1024/1024).toFixed(1),
+            activePercent: memoryRAM.active/memoryRAM.total  == undefined ? null : (100*memoryRAM.active/memoryRAM.total).toFixed(1) + "%"
         };
 
         dynamicSystemData.memoryDisk = {
-            total: (memoryDisk.size/1024/1024).toFixed(1),
-            used: (memoryDisk.used/1024/1024).toFixed(1),
-            usedPercent: (100*memoryDisk.used/memoryDisk.size).toFixed(1) + "%"
+            total: memoryDisk.size  == undefined ? null : (memoryDisk.size/1024/1024).toFixed(1),
+            used: memoryDisk.used  == undefined ? null : (memoryDisk.used/1024/1024).toFixed(1),
+            usedPercent: memoryDisk.used/memoryDisk.size  == undefined ? null : (100*memoryDisk.used/memoryDisk.size).toFixed(1) + "%"
         };
 
         // Return a promise.

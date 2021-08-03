@@ -29,6 +29,10 @@ class I2CHandler {
         });
     }
 
+    async close(){
+        this.bus.closeSync();
+    };
+
     readWord(cmd, done){
         let high, low;
         let that = this;

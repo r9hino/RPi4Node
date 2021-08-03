@@ -96,12 +96,14 @@ async function onShutdown(){
     clearInterval(dataInterval);
 
     try {
+        await i2c.close();
+        console.log('I2C connection closed.');
         await localInfluxDB.closeClient([sensorBucket, systemBucket]);
         
         io.close(() => {
-            console.log('Socket.io closed...');
+            console.log('Socket.io closed.');
             httpServer.close(() => {
-                console.log('HTTP server process terminated...')
+                console.log('HTTP server process terminated.')
                 process.exit(0);
             });
         });

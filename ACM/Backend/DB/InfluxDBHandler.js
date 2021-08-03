@@ -46,7 +46,7 @@ class InfluxDBHandler {
     closeClient = async (buckets) => {
         await Promise.all(buckets.map(async bucket => {
             await this.writeAPI[bucket].close();
-            console.log(`Connection to ${bucket} bucket closed...`);
+            console.log(`Connection to ${bucket} bucket closed.`);
         }));
     }
 }

@@ -72,15 +72,15 @@
 </template>
 
 <script>
-import io from 'socket.io-client'
-const socket = io('http://rpi4id0.mooo.com:5000')
+//import io from 'socket.io-client'
+//const socket = io('http://rpi4id0.mooo.com:5000')
 
 export default {
-  name: 'SystemInfo',
+  name: 'systeminfo',
   components: {},
   props: [],
   data() {
-    socket.on("connections", (data) => {
+    /*socket.on("connections", (data) => {
       connections.value = data;
       console.log(data);
     });
@@ -94,7 +94,7 @@ export default {
       this.dynamicSystemData = data;
       console.log(data);
     });
-
+*/
     return {
       staticSystemData: "",
       dynamicSystemData: "",
@@ -108,10 +108,10 @@ export default {
     }
   },
   beforeMount() {
-    socket.connect();
+    //socket.connect();
   },
   beforeUnmount() {
-    socket.disconnect();
+    //socket.disconnect();
   },
 }
 </script>

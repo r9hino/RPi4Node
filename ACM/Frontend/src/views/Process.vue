@@ -1,5 +1,10 @@
 <template>
   <h1>Homepage</h1><h1>{{ title }}</h1>
+  
+  
+  <router-link v-if="!isLoggedIn" to="/login"><button>Login</button></router-link>
+  
+  
   <p>{{ this.$route}}</p>
   <input type="text" ref="name">
   <button @click="handleClick">Click me</button>
@@ -17,6 +22,7 @@
 </template>
 
 <script>
+import {mapGetters} from "vuex";
 import Modal from '../components/Modal.vue'
 
 import io from 'socket.io-client'
@@ -52,6 +58,9 @@ export default {
       this.$refs.name.classList.add('active')
       this.$refs.name.focus()
     }
+  },
+  computed: {
+    ...mapGetters(["isLoggedIn"])
   },
   beforeMount() {
     socket.connect();

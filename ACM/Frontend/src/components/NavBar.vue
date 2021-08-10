@@ -10,8 +10,8 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <router-link class="routerLink" to="/">Process</router-link>
-          <router-link class="routerLink" to="/Calibration">Calibration</router-link>
-          <router-link class="routerLink" to="/SystemInfo">System Info</router-link>
+          <router-link class="routerLink" to="/calibration">Calibration</router-link>
+          <router-link class="routerLink" to="/systeminfo">System Info</router-link>
         </ul>
       </div>
     </div>

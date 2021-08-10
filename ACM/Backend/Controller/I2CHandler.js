@@ -31,6 +31,7 @@ class I2CHandler {
 
     async close(){
         this.bus.closeSync();
+        console.log('I2C connection closed.');
     };
 
     readWord(cmd, done){

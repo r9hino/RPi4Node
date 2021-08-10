@@ -13,8 +13,10 @@ const socketioPort = process.env.SOCKETIO_PORT;
 
 
 const express = require('express');
+const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io');
+const jwt = require("jsonwebtoken");
 
 const I2CHandler = require('./Controller/I2CHandler');
 const systemData = require('./Controller/systemData');
@@ -22,6 +24,35 @@ const SensorMonitor = require('./Controller/SensorMonitor');
 const InfluxDBHandler = require('./DB/InfluxDBHandler');
 
 const app = express();
+app.use(express.json());
+app.use(cors());
+
+app.post("/login", (req, res) => {
+    const USERNAME = "uma";
+    const PASSWORD = "8888";
+  
+    const {username, password} = req.body;
+  
+    if(username === USERNAME && password === PASSWORD){
+      const user = {
+        id: 1,
+        name: "philippe",
+        username: "pi",
+      };
+      const token = jwt.sign(user, process.env.JWT_KEY);
+      res.json({
+        token,
+        user,
+      });
+    }
+    else{
+      res.status(403);
+      res.json({
+        message: "Wrong login information",
+      });
+    }
+});
+
 const httpServer = http.createServer(app).listen(socketioPort, () => console.log(`HTTP server for socket.io is listening on port ${socketioPort}`));
 const io = socketio(httpServer, {cors: true});
 
@@ -97,7 +128,6 @@ async function onShutdown(){
 
     try {
         await i2c.close();
-        console.log('I2C connection closed.');
         await localInfluxDB.closeClient([sensorBucket, systemBucket]);
         
         io.close(() => {

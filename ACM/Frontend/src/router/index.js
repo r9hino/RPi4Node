@@ -1,30 +1,43 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store/index';
+
+import Home from '../views/Home.vue';
 import Process from '../views/Process.vue';
-import Login from '../views/Login.vue';
 import Calibration from '../views/Calibration.vue';
 import SystemInfo from '../views/SystemInfo.vue';
+import Login from '../views/Login.vue';
 
 const routes = [
   {
     path: '/',
+    name: 'home',
+    component: Home,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/process',
     name: 'process',
-    component: Process
+    component: Process,
+    meta: { requiresAuth: true },
   },
   {
     path: "/login",
     name: "login",
     component: Login,
+    meta: { requiresAuth: false },
   },
   {
     path: '/calibration',
     name: 'calibration',
-    component: Calibration
+    component: Calibration,
+    meta: { requiresAuth: true },
   },
   {
     path: '/systeminfo',
     name: 'systeminfo',
     component: SystemInfo,
-    props: true
+    props: true,
+    meta: { requiresAuth: true },
   },
 ]
 
@@ -32,5 +45,18 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  if(to.matched.some((record) => record.meta.requiresAuth)){
+    if(store.getters.isAuthenticated){
+      next();
+      return;
+    }
+    next("/login");
+  }
+  else {
+    next();
+  }
+});
 
 export default router

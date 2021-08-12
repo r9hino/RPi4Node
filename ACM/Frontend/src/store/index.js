@@ -4,19 +4,23 @@ export default createStore({
     state: {
         user: null,
         token: null,
+        authenticated: false,
     },
     mutations: {
-    setUser(state, user) {
-        state.user = user;
-    },
-    setToken(state, token) {
-        state.token = token;
-    },
+        setUser(state, user) {
+            state.user = user;
+        },
+        setToken(state, token) {
+            state.token = token;
+        },
+        setAuthenticated(state, isAuthenticated) {
+            state.authenticated = isAuthenticated;
+        },
     },
     actions: {},
     getters: {
-        isLoggedIn(state) {
-            return !!state.token;
-        },
+        getUser: (state) => state.user,
+        getToken: (state) => state.token,
+        isAuthenticated: (state) => state.authenticated,
     },
 });

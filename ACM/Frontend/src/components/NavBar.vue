@@ -9,7 +9,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <router-link class="routerLink" to="/">Process</router-link>
+          <router-link class="routerLink" to="/">Home</router-link>
+          <router-link class="routerLink" to="/process">Process</router-link>
           <router-link class="routerLink" to="/calibration">Calibration</router-link>
           <router-link class="routerLink" to="/systeminfo">System Info</router-link>
         </ul>

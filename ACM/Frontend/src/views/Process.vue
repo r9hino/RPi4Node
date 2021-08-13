@@ -1,8 +1,6 @@
 <template>
   <h1>Homepage</h1><h1>{{ title }}</h1>
   
-  <router-link v-if="!isAuthenticated" to="/login"><button>Login</button></router-link>
-  
   <p>{{this.$route}}</p>
   <input type="text" ref="name">
   <button @click="handleClick">Click me</button>
@@ -37,7 +35,7 @@ export default {
 
   },
   computed: {
-    ...mapGetters(['isAuthenticated'])
+    ...mapGetters(['getAuthenticated'])
   },
   beforeMount(){
     socket.connect();

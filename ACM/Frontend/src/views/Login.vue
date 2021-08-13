@@ -12,11 +12,15 @@
             <label for="floatingPassword">Password</label>
         </div>
         <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" value="remember-me"> Remember me
-        </label>
+            <label>
+                <input type="checkbox" value="remember-me"> Remember me
+            </label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">Log in</button>
+        <div class="warning" v-if="!!error" >
+            <p class='warning'>{{ error }}</p>
+            <p class='warning'>Attempts available: {{ attemptsAvailable }}</p>
+        </div>
     </form>
   </main>
 </template>
@@ -27,8 +31,11 @@ import {mapMutations} from "vuex";
 export default {
     data: () => {
         return {
-            username: "",
-            password: "",
+            username: '',
+            password: '',
+            error: null,
+            attemptsAvailable: null,
+            remainingTime: 0,
         };
     },
     methods: {
@@ -46,12 +53,21 @@ export default {
             });
 
             if(response.status == 200){
+                this.error = null;
+
                 const {user, token} = await response.json();
                 this.setUser(user);
                 this.setToken(token);
                 this.setAuthenticated(true);
                 //console.log(user, token);
                 await this.$router.push("/");
+            }
+            else{
+                const {message, attemptsAvailable, remainingTime} = await response.json();
+                this.error = message;
+                this.attemptsAvailable = attemptsAvailable;
+                this.remainingTime = remainingTime;
+                //console.log(this.error);
             }
         },
     },
@@ -91,5 +107,13 @@ body {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.warning {
+    margin-top: 20px;
+}
+p.warning {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 </style>

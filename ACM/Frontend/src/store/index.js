@@ -21,6 +21,6 @@ export default createStore({
     getters: {
         getUser: (state) => state.user,
         getToken: (state) => state.token,
-        isAuthenticated: (state) => state.authenticated,
+        getAuthenticated: (state) => state.authenticated,
     },
 });

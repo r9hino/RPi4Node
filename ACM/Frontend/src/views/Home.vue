@@ -10,7 +10,7 @@ export default {
     const store = useStore();
 
     const user = computed(() => store.getters.getUser);
-    const isAuthenticated = computed(() => store.getters.isAuthenticated);
+    const isAuthenticated = computed(() => store.getters.getAuthenticated);
     return {
       user,
       isAuthenticated,

@@ -33,7 +33,7 @@ const limiter = rateLimit({
     max: 25, // limit each IP to 100 requests per windowMs
     message: 'Too many requests' // message to send
 });
-//app.use(limiter);
+app.use(limiter);
 app.use(cors());
 app.use(routes);
 
@@ -74,17 +74,19 @@ let minuteInterval = setInterval(async () => {
 
 
 // Send data through sockets.
-let dataInterval;
+let dynamicDataInterval;
 io.on("connection", (socket) => {
     console.log(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
 
-    if(dataInterval) clearInterval(dataInterval);
+    if(dynamicDataInterval) clearInterval(dynamicDataInterval);
 
-    // Promise with the static system data.
-    systemData.getStaticData()
-              .then(data => io.emit('socketStaticSystemData', data));
+    // At connection send static and dynamic system data.
+    systemData.getStaticData().then(data => io.emit('socketStaticSystemData', data));
+    systemData.getDynamicData().then(data => io.emit('socketDynamicSystemData', data));
 
-    dataInterval = setInterval(() => {
+    dynamicDataInterval = setInterval(() => {
+        systemData.getDynamicData().then(data => io.emit('socketDynamicSystemData', data));
+
         io.emit('socketAnalogValues', {
             analog0: analogSensor.average(),
             temperature: temperatureSensor.average()
@@ -93,7 +95,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
-        if(io.engine.clientsCount === 0) clearInterval(dataInterval);
+        if(io.engine.clientsCount === 0) clearInterval(dynamicDataInterval);
     });
 });
 
@@ -101,7 +103,7 @@ async function onShutdown(){
     console.log("The server is closing...");
     clearInterval(tenSecInterval);
     clearInterval(minuteInterval);
-    clearInterval(dataInterval);
+    clearInterval(dynamicDataInterval);
 
     try {
         await i2c.close();

@@ -72,19 +72,14 @@
 </template>
 
 <script>
-//import io from 'socket.io-client'
-//const socket = io('http://rpi4id0.mooo.com:5000')
+import io from 'socket.io-client'
+const socket = io('http://rpi4id0.mooo.com:5000', {autoConnect: false})
 
 export default {
   name: 'systeminfo',
   components: {},
   props: [],
-  data() {
-    /*socket.on("connections", (data) => {
-      connections.value = data;
-      console.log(data);
-    });
-
+  data(){
     socket.on("socketStaticSystemData", data => {
       this.staticSystemData = data;
       console.log(data);
@@ -94,7 +89,7 @@ export default {
       this.dynamicSystemData = data;
       console.log(data);
     });
-*/
+
     return {
       staticSystemData: "",
       dynamicSystemData: "",
@@ -107,11 +102,13 @@ export default {
       else return data[key];
     }
   },
-  beforeMount() {
-    //socket.connect();
+  mounted(){
+    socket.connect();
   },
-  beforeUnmount() {
-    //socket.disconnect();
+  beforeUnmount(){
+    socket.off("socketStaticSystemData");
+    socket.off("socketDynamicSystemData");
+    socket.disconnect();
   },
 }
 </script>

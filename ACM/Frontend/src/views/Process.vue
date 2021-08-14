@@ -8,12 +8,11 @@
 
 <script>
 import {mapGetters, useStore} from "vuex"
+import io from 'socket.io-client'
 
 import Modal from '../components/Modal.vue'
 
-import io from 'socket.io-client'
-const socket = io('http://rpi4id0.mooo.com:5000')
-
+const socket = io('http://rpi4id0.mooo.com:5000', {autoConnect: false})
 
 export default {
   components: { Modal },

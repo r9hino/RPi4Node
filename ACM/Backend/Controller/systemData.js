@@ -6,7 +6,7 @@ const getStaticData = async () => {
         network = network[0];//.filter(obj => {return obj.type === 'wireless'})[0];
 
         const staticSystemData = {};
-
+    
         staticSystemData.osInfo = {
             distro: `${osInfo.distro.slice(0,6)} ${osInfo.release} - ${osInfo.codename.charAt(0).toUpperCase() + osInfo.codename.slice(1)}`,
             kernel: osInfo.kernel,

@@ -3,13 +3,13 @@ node_modules/
 /dist
 /ACM/Docker/influxdb2/
 
-
 # env files
 .env
 .env.local
 .env.*.local
 
 # Log files
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,9 +1,10 @@
 const si = require('systeminformation');
+const logger = require('../Logs/logger');
 
 const getStaticData = async () => {
     try {
         let [osInfo, network, networkGateway] = await Promise.all([si.osInfo(), si.networkInterfaces(), si.networkGatewayDefault()]);
-        network = network[0];//.filter(obj => {return obj.type === 'wireless'})[0];
+        network = network[0];
 
         const staticSystemData = {};
     
@@ -24,7 +25,7 @@ const getStaticData = async () => {
         return staticSystemData;
     }
     catch(e){
-        console.log(e);
+        logger.error(e);
     }
 };
 
@@ -68,7 +69,7 @@ const getDynamicData = async () => {
         return dynamicSystemData;
     }
     catch(e){
-        console.log(e);
+        logger.error(e);
     }
 };
 

@@ -6,9 +6,10 @@ require('dotenv').config({ path: '../.env' })
 const router = require('express').Router();
 const jwt = require("jsonwebtoken");
 
-const ipReqMonitor = {};
+const logger = require('../Logs/logger');
+
+const ipReqMonitor = {};        // Store IPs and number of attempts.
 const maxNumberOfAttempts = 5;
-//let numberOfAttempts = 5;
 const waitTime = 10*1000;
 let timeoutInterval = null;
 let start, stop;
@@ -32,12 +33,15 @@ router.post("/login", (req, res) => {
             res.json({user, token});
             // Delete key from object.
             delete ipReqMonitor[ip];
+            logger.info(`IP ${ip} logged in.`);
             return;
         }
         else{
             ipReqMonitor[ip].numberOfAttempts = ipReqMonitor[ip].numberOfAttempts - 1;
             console.log(ipReqMonitor);
+            // If no more attempts available, block for a period of time.
             if(ipReqMonitor[ip].numberOfAttempts == 0){
+                logger.warn(`Too many attempts from IP ${ip}.`);
                 start = Date.now();
                 timeoutInterval = setTimeout(() => {
                     // After timeout reset number of attempts for this ip.

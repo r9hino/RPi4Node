@@ -12,7 +12,7 @@ import io from 'socket.io-client'
 
 import Modal from '../components/Modal.vue'
 
-const socket = io('http://rpi4id0.mooo.com:5000', {autoConnect: false})
+const socket = io('http://rpi4id0.mooo.com:5000', {autoConnect: false}) // Avoid to connect when the application start. Do it manually.
 
 export default {
   components: { Modal },

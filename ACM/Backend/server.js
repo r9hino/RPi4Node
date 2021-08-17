@@ -25,6 +25,7 @@ const systemData = require('./Controller/systemData');
 const SensorMonitor = require('./Controller/SensorMonitor');
 const InfluxDBHandler = require('./DB/InfluxDBHandler');
 const routes = require('./routes/routes');
+const logger = require('./Logs/logger');
 
 const app = express();
 app.use(express.json({ limit: '10kb' }));
@@ -37,7 +38,7 @@ app.use(limiter);
 app.use(cors());
 app.use(routes);
 
-const httpServer = http.createServer(app).listen(socketioPort, () => console.log(`HTTP server for socket.io is listening on port ${socketioPort}`));
+const httpServer = http.createServer(app).listen(socketioPort, () => logger.info(`HTTP server for socket.io is listening on port ${socketioPort}`));
 const io = socketio(httpServer, {cors: true});
 
 const i2c = new I2CHandler();
@@ -54,7 +55,7 @@ let analogSensor = new SensorMonitor('voltage', 'V', 1000*1, 10, analogRetriever
 // Intervals for data injection to Influx DB.
 let tenSecInterval = setInterval(async () => {
     let dynamicData = await systemData.getDynamicData();
-    console.log(dynamicData.memoryRAM.activePercent, dynamicData.memoryDisk.usedPercent, dynamicData.cpu.currentLoad);
+    logger.debug(`${dynamicData.memoryRAM.activePercent} - ${dynamicData.memoryDisk.usedPercent} - ${dynamicData.cpu.currentLoad}`);
     if(dynamicData.memoryRAM.activePercent !== null) localInfluxDB.writeData(systemBucket, 'active-ram', '%', dynamicData.memoryRAM.activePercent);
     if(dynamicData.memoryDisk.usedPercent !== null)  localInfluxDB.writeData(systemBucket, 'used-disk', '%', dynamicData.memoryDisk.usedPercent);
     if(dynamicData.cpu.currentLoad !== null) localInfluxDB.writeData(systemBucket, 'cpu', '%', dynamicData.cpu.currentLoad);
@@ -65,7 +66,7 @@ let tenSecInterval = setInterval(async () => {
 }, 1000*10);
 
 let minuteInterval = setInterval(async () => {
-    console.log('Temperature average is:', temperatureSensor.average(), temperatureSensor.values);
+    logger.debug(`Temperature average is:' ${temperatureSensor.average()}    ${temperatureSensor.values}`);
     localInfluxDB.writeData(sensorBucket, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
     //console.log(localInfluxDB.writeAPI[sensorBucket].writeBuffer);
     //console.log(localInfluxDB.writeAPI[sensorBucket].retryBuffer);
@@ -76,7 +77,7 @@ let minuteInterval = setInterval(async () => {
 // Send data through sockets.
 let dynamicDataInterval;
 io.on("connection", (socket) => {
-    console.log(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
+    logger.info(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
 
     if(dynamicDataInterval) clearInterval(dynamicDataInterval);
 
@@ -94,13 +95,13 @@ io.on("connection", (socket) => {
     }, 2000);
 
     socket.on("disconnect", () => {
-        console.log(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
+        logger.info(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
         if(io.engine.clientsCount === 0) clearInterval(dynamicDataInterval);
     });
 });
 
 async function onShutdown(){
-    console.log("The server is closing...");
+    logger.info("The server is closing...");
     clearInterval(tenSecInterval);
     clearInterval(minuteInterval);
     clearInterval(dynamicDataInterval);
@@ -108,17 +109,17 @@ async function onShutdown(){
     try {
         await i2c.close();
         await localInfluxDB.closeClient([sensorBucket, systemBucket]);
-        
+
         io.close(() => {
-            console.log('Socket.io closed.');
+            logger.info('Socket.io closed.');
             httpServer.close(() => {
-                console.log('HTTP server process terminated.')
+                logger.info('HTTP server process terminated.')
                 process.exit(0);
             });
         });
     }
     catch(error){
-        console.log('Error: ', error);
+        logger.error('Error: ', error);
         process.exit(0);
     }
 }

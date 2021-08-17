@@ -1,5 +1,12 @@
+// Basics commands for i2c:
+//  - sudo chmod 666 /dev/i2c-1   // Change permission on device.
+//  - i2cdetect -y 1
+//  - i2cset -y 1 0x24 0b0010
+//  - i2cget -y 1 0x24
+
 const i2c = require('i2c-bus');
 const ADS1115 = require('ads1115');
+const logger = require('../Logs/logger');
 
 // Registers
 const I2C_BUS_NUMBER = 1;
@@ -11,11 +18,10 @@ const MPU6050_ADDRESS = 0x68,
 
 const ADS1115_ADDRESS = 0x48;
 
+const RELAY_ADDRES = 0x24;
+
 class I2CHandler {
     constructor(){
-        /*if (!(this instanceof I2CHandler)){
-            return new I2CHandler(i2cBusNumber, address);
-        }*/
         this.i2cBusNumber = I2C_BUS_NUMBER;
         this.bus = i2c.openSync(I2C_BUS_NUMBER);
         this.calibration = {};
@@ -31,7 +37,7 @@ class I2CHandler {
 
     async close(){
         this.bus.closeSync();
-        console.log('I2C connection closed.');
+        logger.info('I2C connection closed.');
     };
 
     readWord(cmd, done){
@@ -101,8 +107,33 @@ class I2CHandler {
     async readAnalog(){
         //let ads = ADS1115.open(this.i2cBusNumber, ADS1115_ADDRESS, 'i2c-bus');
         //ads.gain = 1;
-        return this.ads1115.measure('0+GND')
-    } // readAnalog()
+        return this.ads1115.measure('0+GND');
+    }
+
+    // relayID can be any number from 0 to 7. state can be 0 or 1.
+    setRelayState(relayID, state){
+        const previewState = this.getRelayState();
+        const relayMask = 1 << relayID;
+
+        // Determine new state with bit operations. If new state is 1 use OR, if new state is zero use AND.
+        const newState = (state == 1) ? (previewState | relayMask) : (previewState & ~relayMask);
+
+        i2c1.sendByte(RELAY_ADDRESS, newState, function(err){
+            if(err){
+                logger.error('Error sending byte to relay i2c: ' + err);
+            }
+            else{
+                logger.info(`Relay state changed to: ${newState}`);
+            }
+        });
+    }
+
+    // Get actual state of the relay board.
+    getRelayState(){
+        const relayState = i2c1.receiveByteSync(RELAY_ADDRESS);
+        return relayState;
+    }
+
 } // Class
 
 module.exports = I2CHandler;

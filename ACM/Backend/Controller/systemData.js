@@ -40,9 +40,14 @@ const getDynamicData = async () => {
 
         const dynamicSystemData = {};
 
+        let sec = time.uptime%60;
+        let min = ((time.uptime - sec)/60) % 60;
+        let hr = ((time.uptime - sec - min*60)/60/60)%24;
+        let days = (time.uptime - sec - min*60 - hr*60*60)/60/60/24;
+
         dynamicSystemData.time = {
             currentTime: new Date().toString().slice(0,24),
-            uptime: new Date(time.uptime*1000).toISOString().substr(11, 8),
+            uptime: `${days} days  -  ${hr} hours  -  ${min} minutes  -  ${sec.toFixed(0)} seconds`,
             timezone: time.timezone
         };
 

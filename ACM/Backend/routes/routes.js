@@ -38,7 +38,7 @@ router.post("/login", (req, res) => {
         }
         else{
             ipReqMonitor[ip].numberOfAttempts = ipReqMonitor[ip].numberOfAttempts - 1;
-            console.log(ipReqMonitor);
+            //logger.debug(ipReqMonitor);
             // If no more attempts available, block for a period of time.
             if(ipReqMonitor[ip].numberOfAttempts == 0){
                 logger.warn(`Too many attempts from IP ${ip}.`);

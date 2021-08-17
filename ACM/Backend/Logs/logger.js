@@ -33,7 +33,6 @@ const options = {
         handleExceptions: true,
         json: false,
         colorize: true,
-        format: format.simple()
     },
 };
 

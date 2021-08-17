@@ -1,6 +1,11 @@
+// Links
+// https://github.com/influxdata/influxdb-client-js/blob/master/examples/writeAdvanced.js
+
 require('dotenv').config({path: __dirname + '/../.env'});
 const {InfluxDB, Point} = require('@influxdata/influxdb-client');
 const {hostname} = require('os');
+
+const logger = require('../Logs/logger');
 
 
 class InfluxDBHandler {
@@ -32,7 +37,7 @@ class InfluxDBHandler {
     addWriteAPI(buckets){
         buckets.forEach(bucket => {
             let writeAPI = this.dbClient.getWriteApi(this.org, bucket);
-            console.log(`Influx ${bucket} bucket API available.`);
+            logger.info(`Influx ${bucket} bucket API available.`);
 
             this.writeAPI[bucket] = writeAPI;  
         });
@@ -46,7 +51,7 @@ class InfluxDBHandler {
     closeClient = async (buckets) => {
         await Promise.all(buckets.map(async bucket => {
             await this.writeAPI[bucket].close();
-            console.log(`Connection to ${bucket} bucket closed.`);
+            logger.info(`Connection to ${bucket} bucket closed.`);
         }));
     }
 }

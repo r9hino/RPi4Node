@@ -34,7 +34,7 @@ const limiter = rateLimit({
     max: 25, // limit each IP to 100 requests per windowMs
     message: 'Too many requests' // message to send
 });
-app.use(limiter);
+//app.use(limiter);
 app.use(cors());
 app.use(routes);
 

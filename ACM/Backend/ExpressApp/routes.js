@@ -30,6 +30,7 @@ router.post("/login", (req, res) => {
         if(username === USERNAME && password === PASSWORD){
             const user = {id: 1, username: "pi"};
             const token = jwt.sign(user, process.env.WEB_JWT_KEY);
+            res.status(200);
             res.json({user, token});
             // Delete key from object.
             delete ipReqMonitor[ip];
@@ -79,6 +80,13 @@ router.post("/login", (req, res) => {
             remainingTime: (waitTime - (stop - start))/1000,
         });
     }
+});
+
+router.get("/api/info", (req, res) => {
+    res.status(200);
+    res.json({
+        message: `200.200.200.200`
+    });
 });
 
 module.exports = router;

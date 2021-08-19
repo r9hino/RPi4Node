@@ -1,0 +1,54 @@
+{
+    "_id": "611d9de564bd88d2ff358f23",
+    "hostname": "rpi4id0",
+    "hardware": "Raspberry Pi 4",
+    "os": "Ubuntu 21.04 hirsute",
+    "dns": "rpi4id0.mooo.com",
+    "company": "Chilterra",
+    "name_place": "Huite Pozo Profundo 1",
+    "geo_coordinate": "",
+    "relay": [
+        {
+            "id": 0,
+            "description": "Control bomba 1",
+            "state": 0,
+            "autoOn": null,
+            "autoOff": null
+        },
+        {
+            "id": 1,
+            "description": "Control bomba 2",
+            "state": 0,
+            "autoOn": null,
+            "autoOff": null
+        },
+        {
+            "id": 2,
+            "description": "Electrovalvula principal",
+            "state": 0,
+            "autoOn": null,
+            "autoOff": null
+        }
+    ],
+    "input": [
+        {
+            "id": 0,
+            "pin_number": 23,
+            "description": "Caudalimetro",
+            "sensor_model": null,
+            "protocol": null
+        },
+        {
+            "id": 0,
+            "pin_number": [
+                1,
+                3,
+                5,
+                9
+            ],
+            "description": "Presion",
+            "sensor_model": null,
+            "protocol": "i2c"
+        }
+    ]
+}

@@ -20,8 +20,12 @@
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.currentTime : ""}}</td>
         </tr>
         <tr>
-          <td>Uptime</td>
-          <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.uptime : ""}}</td>
+          <td>Node Uptime</td>
+          <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.nodeUpTime : ""}}</td>
+        </tr>
+        <tr>
+          <td>Raspberry Pi Uptime</td>
+          <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.rpiUpTime : ""}}</td>
         </tr>
         <tr>
           <td>Timezone</td>

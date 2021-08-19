@@ -1,4 +1,5 @@
 const si = require('systeminformation');
+const process = require('process');
 const logger = require('../Logs/logger');
 
 const getStaticData = async () => {
@@ -38,15 +39,22 @@ const getDynamicData = async () => {
         memoryDisk = memoryDisk[0];
 
         const dynamicSystemData = {};
+        const nodeUpTime = process.uptime();
 
-        let sec = time.uptime%60;
-        let min = ((time.uptime - sec)/60)%60;
-        let hr = ((time.uptime - sec - min*60)/60/60)%24;
-        let days = (time.uptime - sec - min*60 - hr*60*60)/60/60/24;
+        let nodeSec = nodeUpTime%60;
+        let nodeMin = ((nodeUpTime - nodeSec)/60)%60;
+        let nodeHr = ((nodeUpTime - nodeSec - nodeMin*60)/60/60)%24;
+        let nodeDays = (nodeUpTime - nodeSec - nodeMin*60 - nodeHr*60*60)/60/60/24;
+
+        let rpiSec = time.uptime%60;
+        let rpiMin = ((time.uptime - rpiSec)/60)%60;
+        let rpiHr = ((time.uptime - rpiSec - rpiMin*60)/60/60)%24;
+        let rpiDays = (time.uptime - rpiSec - rpiMin*60 - rpiHr*60*60)/60/60/24;
 
         dynamicSystemData.time = {
             currentTime: new Date().toString().slice(0,24),
-            uptime: `${days} days  -  ${hr} hr  -  ${min} min  -  ${sec.toFixed(0)} sec`,
+            nodeUpTime: `${nodeDays} days  -  ${nodeHr} hr  -  ${nodeMin} min  -  ${nodeSec.toFixed(0)} sec`,
+            rpiUpTime: `${rpiDays} days  -  ${rpiHr} hr  -  ${rpiMin} min  -  ${rpiSec.toFixed(0)} sec`,
             timezone: time.timezone
         };
 

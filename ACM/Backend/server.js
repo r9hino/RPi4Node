@@ -41,7 +41,7 @@ const localInfluxDB = new InfluxDBHandler(influxURL, influxPort, token, org, [se
 
 let httpServer, io, dynamicDataInterval, tenSecInterval, minuteInterval;
 
-// Sequential function to initialize the server.
+// Sequential initialization functions.
 const initializationFunctionList = [
     // Initialize system state.
     async () => {
@@ -61,7 +61,6 @@ const initializationFunctionList = [
         else{
             logger.info('System state database already exist.');
         }
-
     },
     // Initialize http server and socket.io.
     async () => {
@@ -84,7 +83,7 @@ async function initializer(){
 
 initializer();
 
-// Intervals for data injection to Influx DB.
+// Intervals for data retrieval and injection.
 const tenSecFunction = async () => {
     let dynamicData = await osData.getDynamicData();
     if(dynamicData.memoryRAM.activePercent !== null) localInfluxDB.writeData(systemBucket, 'active-ram', '%', dynamicData.memoryRAM.activePercent);

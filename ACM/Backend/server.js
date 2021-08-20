@@ -1,8 +1,11 @@
 // Links:
 // Promise - async/await: https://blog.risingstack.com/mastering-async-await-in-nodejs/ https://dmitripavlutin.com/what-is-javascript-promise/
 // Class: https://javascript.info/class#not-just-a-syntactic-sugar
-// Vue basics: https://github.com/iamshaunjp/Vue-3-Firebase/tree/master
+// Vue basics: https://github.com/iamshaunjp/Vue-3-Firebase/tree/master  https://www.vuemastery.com/pdf/Vue-3-Cheat-Sheet.pdf
 // Vue authentication: https://www.smashingmagazine.com/2020/10/authentication-in-vue-js/
+
+// To-do
+// Synchronize local and remote database when remote dabase is offline and reconnect.
 
 const http = require('http');
 const socketio = require('socket.io');
@@ -65,7 +68,8 @@ const initializationFunctionList = [
         // Add OS and system info.
         const newValuesToStore = {
             node_version: process.version,
-            architecture: process.arch
+            architecture: process.arch,
+            date_update: new Date().toString(),
         };
 
         // Store locally OS and system info.

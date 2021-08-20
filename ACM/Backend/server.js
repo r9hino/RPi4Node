@@ -1,5 +1,5 @@
 // Links:
-// Promise - async/await: https://blog.risingstack.com/mastering-async-await-in-nodejs/
+// Promise - async/await: https://blog.risingstack.com/mastering-async-await-in-nodejs/ https://dmitripavlutin.com/what-is-javascript-promise/
 // Class: https://javascript.info/class#not-just-a-syntactic-sugar
 // Vue basics: https://github.com/iamshaunjp/Vue-3-Firebase/tree/master
 // Vue authentication: https://www.smashingmagazine.com/2020/10/authentication-in-vue-js/
@@ -8,6 +8,7 @@ const http = require('http');
 const socketio = require('socket.io');
 const {hostname} = require('os');
 const JSONdb = require('simple-json-db');
+const proceess = require('process');
 
 const I2CHandler = require('./Controller/I2CHandler');
 const osData = require('./Controller/osData');
@@ -34,7 +35,7 @@ const temperatureRetriever = async () => await i2c.readTempSync();
 const analogRetriever = async () => await i2c.readAnalog();
 const temperatureSensor = new SensorMonitor('temperature', '°C', 1000*10, 20, temperatureRetriever);
 const analogSensor = new SensorMonitor('voltage', 'V', 1000*1, 10, analogRetriever);
-const stateDB = new JSONdb('stateDB.json');
+const deviceMetadataDB = new JSONdb('deviceMetadataDB.json');
 const remoteMongoDB = new MongoDBHandler(remoteMongoURL);
 const localInfluxDB = new InfluxDBHandler(influxURL, influxPort, token, org, [sensorBucket, systemBucket]);
 
@@ -45,22 +46,44 @@ let httpServer, io, dynamicDataInterval, tenSecInterval, minuteInterval;
 const initializationFunctionList = [
     // Initialize system state.
     async () => {
-        let data = stateDB.JSON();  // Find local storage for system state.
+        let deviceMetadata = deviceMetadataDB.JSON();  // Find local storage for system state.
 
-        // If there are no entries on the local database, go to MongoDB to retrieve it.
-        if(Object.keys(data).length === 0){
-            await remoteMongoDB.connectDB();
-            const state = await remoteMongoDB.getDeviceState(hostname());
+        // If there are no entries on the local database, go to remote MongoDB to retrieve it.
+        if(Object.keys(deviceMetadata).length === 0){
+            try{
+                logger.info('Connecting to remote MongoDB...');
+                await remoteMongoDB.connectDB();
+                logger.info('Retrieving device metadata from remote MongoDB...');
+                deviceMetadata = await remoteMongoDB.getDeviceMetadata(hostname());
+            }
+            catch(e){
+                logger.error('Error, device metadata was not retrieved from remote MongoDB. Exiting Node server...');
+                process.send('STOP');
+            }
+        }
+
+        // Add OS and system info.
+        const newValuesToStore = {
+            node_version: process.version,
+            architecture: process.arch
+        };
+
+        // Store locally OS and system info.
+        deviceMetadata = Object.assign(deviceMetadata, newValuesToStore);
+        deviceMetadataDB.JSON(deviceMetadata);
+        deviceMetadataDB.sync();
+        logger.info('New OS and system values stored locally');
+
+        // Store remotely new values retrieved from the OS and system.
+        try{
+            if(remoteMongoDB.isConnected() === false) await remoteMongoDB.connectDB();
+            await remoteMongoDB.updateDevice(hostname(), newValuesToStore);
+            logger.info('New OS and system values stored remotely.');
             await remoteMongoDB.close();
-
-            // Store locally system state retrieved from MongoDB.
-            logger.info('Store system state retrieved from MongoDB to local database stateDB.json');
-            stateDB.JSON(state);
-            stateDB.sync();
         }
-        else{
-            logger.info('System state database already exist.');
-        }
+        catch(e){
+            logger.warning('Warning, couldn\'t store new OS and system values in the remote MongoDB.');
+        };
     },
     // Initialize http server and socket.io.
     async () => {
@@ -76,8 +99,8 @@ const initializationFunctionList = [
 ];
 
 async function initializer(){
-    for (const task of initializationFunctionList){
-        await task().catch(e => logger.error(e));
+    for(const task of initializationFunctionList){
+        await task().catch(e => process.exit(1));
     }
 }
 
@@ -150,3 +173,4 @@ async function onShutdown(){
 
 process.on('SIGTERM', onShutdown);
 process.on('SIGINT', onShutdown);
+process.on('STOP', onShutdown);

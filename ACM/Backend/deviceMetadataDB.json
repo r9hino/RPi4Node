@@ -50,5 +50,7 @@
             "sensor_model": null,
             "protocol": "i2c"
         }
-    ]
+    ],
+    "architecture": "arm64",
+    "node_version": "v16.4.2"
 }

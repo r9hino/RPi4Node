@@ -20,11 +20,11 @@
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.currentTime : ""}}</td>
         </tr>
         <tr>
-          <td>Node Uptime</td>
+          <td>Node Up Time</td>
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.nodeUpTime : ""}}</td>
         </tr>
         <tr>
-          <td>Raspberry Pi Uptime</td>
+          <td>Raspberry Pi Up Time</td>
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.rpiUpTime : ""}}</td>
         </tr>
         <tr>

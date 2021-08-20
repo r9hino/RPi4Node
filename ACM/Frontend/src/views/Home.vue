@@ -37,6 +37,10 @@ export default {
     margin: 0px 0px;
     padding: 13px 30px;
   }
+  .form-check-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
   label.form-check-label{
     margin: 3px 10px;
   }

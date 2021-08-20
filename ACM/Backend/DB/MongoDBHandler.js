@@ -9,22 +9,49 @@ class MongoDBHandler {
     constructor(url){
         this.dbClient = null; //await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         this.url = url;
+        this.connected = false;
     }
 
     connectDB = async () => {
         try{
             this.dbClient = await MongoClient.connect(this.url, { useNewUrlParser: true, useUnifiedTopology: true });
+            this.connected = true;
             logger.info('Connected to remote MongoDB.');
         }
         catch(err){
+            this.connected = false;
             logger.error(err);
+            throw err;
         }
     }
-    // Get hostname device state.
-    getDeviceState = async (hostname) => {
-        const cursor = await this.dbClient.db('iot').collection('iot_manager').find({hostname: hostname}).toArray();
-        //console.log(cursor[0]);
-        return cursor[0];
+
+    isConnected = () => {
+        return this.connected;
+    }
+
+    // Get device metadata store remotely.
+    getDeviceMetadata = async (hostname) => {
+        try{
+            const cursor = await this.dbClient.db('iot').collection('iot_manager').find({hostname: hostname}).toArray();
+            return cursor[0];
+        }
+        catch(err){
+            logger.error(err);
+            throw err;
+        }
+    }
+
+    // Update device values.
+    updateDevice = async (hostname, newValues) => {
+        try{
+            const id = await this.dbClient.db('iot').collection('iot_manager')
+                .updateOne({hostname: hostname}, {$set: newValues});
+            return id;
+        }
+        catch(err){
+            logger.error(err);
+            throw err;
+        }
     }
 
     close = async () => {
@@ -33,6 +60,7 @@ class MongoDBHandler {
         else{
             try{
                 this.dbClient.close();
+                this.connected = false;
                 logger.info('Remote MongoDB closed.');
             }
             catch(err){

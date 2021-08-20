@@ -54,9 +54,22 @@ class MongoDBHandler {
         }
     }
 
+    // Update device relay values.
+    updateRelayState = async (hostname, idRelay, state) => {
+        try{
+            const id = await this.dbClient.db('iot').collection('iot_manager')
+                .updateOne({hostname: hostname, 'relays.id': idRelay}, {$set: {'relays.$.state': state}});
+            return id;
+        }
+        catch(err){
+            logger.error(err);
+            throw err;
+        }
+    }
+
     close = async () => {
         // Disconnect only if there is a connection established.
-        if(this.dbClient === null) logger.info('Remote MongoDB connection has already been closed.');
+        if(this.connected === false) logger.info('Remote MongoDB connection has already been closed.');
         else{
             try{
                 this.dbClient.close();

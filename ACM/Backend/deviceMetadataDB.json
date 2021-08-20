@@ -7,29 +7,6 @@
     "company": "Chilterra",
     "name_place": "Huite Pozo Profundo 1",
     "geo_coordinate": "",
-    "relay": [
-        {
-            "id": 0,
-            "description": "Control bomba 1",
-            "state": 0,
-            "autoOn": null,
-            "autoOff": null
-        },
-        {
-            "id": 1,
-            "description": "Control bomba 2",
-            "state": 0,
-            "autoOn": null,
-            "autoOff": null
-        },
-        {
-            "id": 2,
-            "description": "Electrovalvula principal",
-            "state": 0,
-            "autoOn": null,
-            "autoOff": null
-        }
-    ],
     "input": [
         {
             "id": 0,
@@ -52,5 +29,28 @@
         }
     ],
     "architecture": "arm64",
-    "node_version": "v16.4.2"
+    "node_version": "v16.4.2",
+    "relays": [
+        {
+            "id": 0,
+            "description": "Control bomba 1",
+            "state": true,
+            "autoOn": null,
+            "autoOff": null
+        },
+        {
+            "id": 1,
+            "description": "Control bomba 2",
+            "state": true,
+            "autoOn": null,
+            "autoOff": null
+        },
+        {
+            "id": 2,
+            "description": "Electrovalvula principal",
+            "state": false,
+            "autoOn": null,
+            "autoOff": null
+        }
+    ]
 }

@@ -82,7 +82,7 @@ const initializationFunctionList = [
             await remoteMongoDB.close();
         }
         catch(e){
-            logger.warning('Warning, couldn\'t store new OS and system values in the remote MongoDB.');
+            logger.warn('Warning, couldn\'t store new OS and system values in the remote MongoDB.');
         };
     },
     // Initialize http server and socket.io.
@@ -123,30 +123,56 @@ const minuteFunction = async () => {
 
 // Coordinate data through sockets.
 function socketCoordinator(socket){
+    remoteMongoDB.connectDB().catch((e) => logger.warn('Couldn\'t connect to remote MongoDB at starting of socket connection.'));
     logger.info(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
 
     if(dynamicDataInterval) clearInterval(dynamicDataInterval);
 
     // At connection send static and dynamic system data.
-    osData.getStaticData().then(data => io.emit('socketStaticSystemData', data));
-    osData.getDynamicData().then(data => io.emit('socketDynamicSystemData', data));
+    osData.getStaticData().then(data => socket.emit('socketStaticSystemData', data));
+    osData.getDynamicData().then(data => socket.emit('socketDynamicSystemData', data));
 
     dynamicDataInterval = setInterval(() => {
-        osData.getDynamicData().then(data => io.emit('socketDynamicSystemData', data));
+        osData.getDynamicData().then(data => socket.emit('socketDynamicSystemData', data));
 
-        io.emit('socketAnalogValues', {
+        socket.emit('socketAnalogValues', {
             analog0: analogSensor.average(),
             temperature: temperatureSensor.average()
         });
     }, 2000);
 
-    socket.on("disconnect", () => {
+    // Home page: client request for device states only when mounting the page.
+    socket.on('reqRelayStates', () => {
+        let relays = deviceMetadataDB.get('relays');
+        socket.emit('resRelayStates', relays);  // Send device state only to socket requesting it.
+    });
+
+    // Home page: listen for changes made by user on client side. Then update device state.
+    socket.on('elementChanged', (relay) => {
+        // Broadcast new device state to everyone except sender.
+        socket.broadcast.emit('updateClients', relay);
+        let idRelay = relay.id;
+        let relayState = relay.state;
+        let relays = deviceMetadataDB.get('relays');
+        relays[idRelay].state = relayState;
+
+        // Store locally new state.
+        deviceMetadataDB.set('relays', relays);
+        deviceMetadataDB.sync();
+
+        // Store remotely new state.
+        if(remoteMongoDB.isConnected() === false) remoteMongoDB.connectDB().then(() => remoteMongoDB.updateRelayState(hostname(), idRelay, relayState).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB')));
+        else remoteMongoDB.updateRelayState(hostname(), idRelay, relayState).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'));
+    });
+
+    socket.on('disconnect', () => {
         logger.info(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
         if(io.engine.clientsCount === 0) clearInterval(dynamicDataInterval);
+        remoteMongoDB.close();
     });
 }
 
-async function onShutdown(){
+async function shutdownServer(){
     logger.info("The server is closing...");
     clearInterval(tenSecInterval);
     clearInterval(minuteInterval);
@@ -171,6 +197,6 @@ async function onShutdown(){
     }
 }
 
-process.on('SIGTERM', onShutdown);
-process.on('SIGINT', onShutdown);
-process.on('STOP', onShutdown);
+process.on('SIGTERM', shutdownServer);
+process.on('SIGINT', shutdownServer);
+process.on('STOP', shutdownServer);

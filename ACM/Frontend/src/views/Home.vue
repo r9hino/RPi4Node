@@ -1,13 +1,17 @@
 <template>
     <h2>Hello {{ user }}, your authentication is {{ isAuthenticated }}</h2>
-    <label class="switch">
-      <input type="checkbox">
-      <span class="slider round"></span>
-    </label>
+
     <!-- Checked disabled switch -->
-    <div class="form-switch" v-for="relay in relays" :key="relay.id">
-      <input class="form-check-input" @change="onChangeSwitch(relay.id)" type="checkbox" :id="relay.id" :checked="relay.state" />
-      <label class="form-check-label" for="flexSwitchCheckDefault">{{ relay.description }}</label>
+    <div class="container-sm switch-container">
+      <div class="row" v-for="relay in relays" :key="relay.id">
+        <div class="col">
+          {{ relay.description }}
+        </div>
+        <div class="col form-switch">
+          <input class="form-check-input" @change="onChangeSwitch(relay.id)" type="checkbox" :id="relay.id" :checked="relay.state" />
+          <label class="form-check-label" for="flexSwitchCheckDefault"></label>    
+        </div>
+      </div>
     </div>
 </template>
 
@@ -65,18 +69,18 @@ export default {
 };
 </script>
 <style>
+  div.switch-container{
+    width: 500px;
+  }
   div.form-switch{
-    margin: 10px 0px;
+    margin: 5px 0px;
   }
   input.form-check-input{
     margin: 0px 0px;
     padding: 13px 30px;
   }
-  .form-check-input:focus {
+  .form-check-input:focus, .form-check-input:active {
     outline: none !important;
     box-shadow: none !important;
-  }
-  label.form-check-label{
-    margin: 3px 10px;
   }
 </style>

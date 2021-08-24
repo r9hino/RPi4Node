@@ -34,14 +34,14 @@
         {
             "id": 0,
             "description": "Control bomba 1",
-            "state": true,
+            "state": false,
             "autoOn": null,
             "autoOff": null
         },
         {
             "id": 1,
             "description": "Control bomba 2",
-            "state": true,
+            "state": false,
             "autoOn": null,
             "autoOff": null
         },
@@ -53,5 +53,5 @@
             "autoOff": null
         }
     ],
-    "date_update": "Fri Aug 20 2021 18:42:49 GMT-0400 (Chile Standard Time)"
+    "date_update": "Mon Aug 23 2021 23:06:29 GMT-0400 (Chile Standard Time)"
 }

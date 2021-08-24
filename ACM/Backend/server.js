@@ -49,7 +49,7 @@ let httpServer, io, dynamicDataInterval, tenSecInterval, minuteInterval;
 const initializationFunctionList = [
     // Initialize system state.
     async () => {
-        let deviceMetadata = deviceMetadataDB.JSON();  // Find local storage for system state.
+        let deviceMetadata = deviceMetadataDB.JSON();  // Load local storage for system state if any.
 
         // If there are no entries on the local database, go to remote MongoDB to retrieve it.
         if(Object.keys(deviceMetadata).length === 0){
@@ -165,7 +165,15 @@ function socketCoordinator(socket){
         deviceMetadataDB.sync();
 
         // Store remotely new state.
-        if(remoteMongoDB.isConnected() === false) remoteMongoDB.connectDB().then(() => remoteMongoDB.updateRelayState(hostname(), idRelay, relayState).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB')));
+        if(remoteMongoDB.isConnected() === false){
+            remoteMongoDB.connectDB().then(() => {
+                // As remote DB was disconnected, local and remote DB may have different states.
+                // So to avoid difference between them, local DB is loaded and then uploaded to the remote DB.
+                const deviceMetadata = deviceMetadataDB.JSON();
+                delete deviceMetadata["_id"];   // _id is inmutable and can not be updated.
+                remoteMongoDB.updateDevice(hostname(), deviceMetadata).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'))
+            });
+        }
         else remoteMongoDB.updateRelayState(hostname(), idRelay, relayState).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'));
     });
 

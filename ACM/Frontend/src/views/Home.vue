@@ -1,16 +1,12 @@
 <template>
-    <h2>Hello {{ user }}, your authentication is {{ isAuthenticated }}</h2>
-
     <!-- Checked disabled switch -->
-    <div class="container-sm switch-container">
-      <div class="row" v-for="relay in relays" :key="relay.id">
-        <div class="col">
-          {{ relay.description }}
-        </div>
-        <div class="col form-switch">
-          <input class="form-check-input" @change="onChangeSwitch(relay.id)" type="checkbox" :id="relay.id" :checked="relay.state" />
-          <label class="form-check-label" for="flexSwitchCheckDefault"></label>    
-        </div>
+    <div class="container-sm">
+      <h2>Hello {{ user }}, your authentication is {{ isAuthenticated }}</h2>
+      <div>
+          <div class="form-check form-switch" v-for="relay in relays" :key="relay.id">
+            <input class="form-check-input" @change="onChangeSwitch(relay.id)" type="checkbox" :id="relay.id" :checked="relay.state" />
+            <label class="form-check-label" for="flexSwitchCheckDefault">{{ relay.description }}</label>    
+          </div>
       </div>
     </div>
 </template>
@@ -71,9 +67,10 @@ export default {
 <style>
   div.switch-container{
     width: 500px;
+    text-align: center
   }
   div.form-switch{
-    margin: 5px 0px;
+    margin: 15px 0px;
   }
   input.form-check-input{
     margin: 0px 0px;

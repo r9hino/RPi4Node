@@ -16,6 +16,10 @@
           <td>{{staticSystemData !== "" ? staticSystemData.osInfo.arch : ""}}</td>
         </tr>
         <tr>
+          <td>Node Version</td>
+          <td>{{staticSystemData !== "" ? staticSystemData.osInfo.node : ""}}</td>
+        </tr>
+        <tr>
           <td>Date</td>
           <td>{{dynamicSystemData !== "" ? dynamicSystemData.time.currentTime : ""}}</td>
         </tr>

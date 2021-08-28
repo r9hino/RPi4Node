@@ -8,12 +8,13 @@ const getStaticData = async () => {
         network = network[0];
 
         const staticSystemData = {};
-    
+
         staticSystemData.osInfo = {
             distro: `${osInfo.distro.slice(0,6)} ${osInfo.release} - ${osInfo.codename.charAt(0).toUpperCase() + osInfo.codename.slice(1)}`,
             kernel: osInfo.kernel,
             arch: osInfo.arch,
-            serial: osInfo.serial
+            node: process.version,
+            serial: osInfo.serial,
         };
 
         staticSystemData.network = {

@@ -29,7 +29,7 @@
         }
     ],
     "architecture": "arm64",
-    "node_version": "v16.4.2",
+    "node_version": "v16.8.0",
     "relays": [
         {
             "id": 0,
@@ -41,7 +41,7 @@
         {
             "id": 1,
             "description": "Control bomba 2",
-            "state": false,
+            "state": true,
             "autoOn": null,
             "autoOff": null
         },
@@ -53,5 +53,5 @@
             "autoOff": null
         }
     ],
-    "date_update": "Mon Aug 23 2021 23:06:29 GMT-0400 (Chile Standard Time)"
+    "date_update": "Fri Aug 27 2021 22:00:55 GMT-0400 (Chile Standard Time)"
 }

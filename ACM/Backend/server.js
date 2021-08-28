@@ -168,7 +168,7 @@ function socketCoordinator(socket){
         if(remoteMongoDB.isConnected() === false){
             remoteMongoDB.connectDB().then(() => {
                 // As remote DB was disconnected, local and remote DB may have different states.
-                // So to avoid difference between them, local DB is loaded and then uploaded to the remote DB.
+                // So local DB is loaded and then uploaded completely to the remote DB.
                 const deviceMetadata = deviceMetadataDB.JSON();
                 delete deviceMetadata["_id"];   // _id is inmutable and can not be updated.
                 remoteMongoDB.updateDevice(hostname(), deviceMetadata).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'))
@@ -185,7 +185,7 @@ function socketCoordinator(socket){
 }
 
 async function shutdownServer(){
-    logger.info("The server is closing...");
+    logger.info("Shuting down the server...");
     clearInterval(tenSecInterval);
     clearInterval(minuteInterval);
     clearInterval(dynamicDataInterval);

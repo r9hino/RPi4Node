@@ -1,14 +1,19 @@
 <template>
-  <NavBar/>
+  <NavBar v-if="isAuthenticated"/>
   <router-view/>
 </template>
 
 <script>
-import NavBar from './components/NavBar.vue'
-export default {
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import NavBar from './components/NavBar.vue';
+
+export default{
   components: { NavBar },
-  data() {
-    return {}
+  setup(){
+    const store = useStore();
+    const isAuthenticated = computed(() => store.getters.getAuthenticated);
+    return {isAuthenticated}
   }
 }
 </script>

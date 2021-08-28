@@ -34,7 +34,7 @@
         {
             "id": 0,
             "description": "Control bomba 1",
-            "state": false,
+            "state": true,
             "autoOn": null,
             "autoOff": null
         },

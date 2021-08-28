@@ -1,6 +1,7 @@
 <template>
   <main class="form-login">
     <form @submit="login">
+        <img class="mb-4" src="../assets/logo128.png" alt="" width="72" height="90">
         <h1 class="h3 mb-3 fw-normal">Please Log In</h1>
 
         <div class="form-floating">
@@ -75,18 +76,20 @@ export default {
 </script>
 
 <style>
-
 body {
   align-items: center;
   padding-bottom: 40px;
   background-color: #f5f5f5;
+  text-align: center!important;
 }
-
+div.checkbox{
+  margin-top: 15px;
+}
 .form-login {
   width: 100%;
   max-width: 330px;
   padding: 15px;
-  margin: auto;
+  margin: 85px auto auto auto;
 }
 
 .form-login .checkbox {

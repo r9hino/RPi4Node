@@ -1,8 +1,8 @@
 <template>
     <!-- Checked disabled switch -->
-    <div class="container-sm">
+    <div class="container-fluid">
       <h2>Hello {{ user }}, your authentication is {{ isAuthenticated }}</h2>
-      <div>
+      <div class="switch-container">
           <div class="form-check form-switch" v-for="relay in relays" :key="relay.id">
             <input class="form-check-input" @change="onChangeSwitch(relay.id)" type="checkbox" :id="relay.id" :checked="relay.state" />
             <label class="form-check-label" for="flexSwitchCheckDefault">{{ relay.description }}</label>    
@@ -47,8 +47,9 @@ export default {
 
     onBeforeMount(() => {
       socket.connect();
-      socket.emit('reqRelayStates');
+      socket.emit('reqRelayStates');  // Request to server relay states.
     });
+
     onBeforeUnmount(() => {
       socket.off('resRelayStates');
       socket.off('updateClients');
@@ -66,8 +67,7 @@ export default {
 </script>
 <style>
   div.switch-container{
-    width: 500px;
-    text-align: center
+    width: 300px;
   }
   div.form-switch{
     margin: 15px 0px;

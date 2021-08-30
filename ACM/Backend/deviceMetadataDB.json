@@ -36,22 +36,25 @@
             "description": "Control bomba 1",
             "state": true,
             "autoOn": null,
-            "autoOff": null
+            "autoOff": null,
+            "date_update": "Sun Aug 29 2021 01:18:29 GMT-0400 (Chile Standard Time)"
         },
         {
             "id": 1,
             "description": "Control bomba 2",
             "state": false,
             "autoOn": null,
-            "autoOff": null
+            "autoOff": null,
+            "date_update": "Sun Aug 29 2021 01:18:30 GMT-0400 (Chile Standard Time)"
         },
         {
             "id": 2,
             "description": "Electrovalvula principal",
             "state": true,
             "autoOn": null,
-            "autoOff": null
+            "autoOff": null,
+            "date_update": "Sun Aug 29 2021 01:18:30 GMT-0400 (Chile Standard Time)"
         }
     ],
-    "date_update": "Sat Aug 28 2021 11:24:46 GMT-0400 (Chile Standard Time)"
+    "date_update": "Sun Aug 29 2021 22:40:42 GMT-0400 (Chile Standard Time)"
 }

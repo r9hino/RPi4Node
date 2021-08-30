@@ -1,13 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store/index';
 
+import Login from '../views/Login.vue';
 import Home from '../views/Home.vue';
 import Process from '../views/Process.vue';
 import Calibration from '../views/Calibration.vue';
 import SystemInfo from '../views/SystemInfo.vue';
-import Login from '../views/Login.vue';
+import Logs from '../views/Logs.vue';
 
 const routes = [
+  {
+    path: "/login",
+    name: "login",
+    component: Login,
+    meta: { requiresAuth: false },
+  },
   {
     path: '/',
     name: 'home',
@@ -21,12 +28,6 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/login",
-    name: "login",
-    component: Login,
-    meta: { requiresAuth: false },
-  },
-  {
     path: '/calibration',
     name: 'calibration',
     component: Calibration,
@@ -36,6 +37,13 @@ const routes = [
     path: '/systeminfo',
     name: 'systeminfo',
     component: SystemInfo,
+    props: true,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/logs',
+    name: 'logs',
+    component: Logs,
     props: true,
     meta: { requiresAuth: true },
   },

@@ -82,9 +82,11 @@ body {
   background-color: #f5f5f5;
   text-align: center!important;
 }
+
 div.checkbox{
   margin-top: 15px;
 }
+
 .form-login {
   width: 100%;
   max-width: 330px;

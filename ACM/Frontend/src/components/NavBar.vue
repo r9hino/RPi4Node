@@ -7,14 +7,18 @@
       <div class="navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link class="routerLink" to="/">Home</router-link>
+            <router-link class="routerLink" to="/" @click="setToolActiveClass(false)">Home</router-link>
           </li>
           <!--<router-link class="routerLink" to="/process">Process</router-link>-->
-          <li class="nav-item active">
-            <router-link class="routerLink" to="/calibration">Calibration</router-link>
-          </li>
           <li class="nav-item">
-            <router-link class="routerLink" to="/systeminfo">System Info</router-link>
+            <router-link class="routerLink" to="/calibration" @click="setToolActiveClass(false)">Calibration</router-link>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="dropdown-toggle routerLink" :style="{ color: isToolActive ? '#0a58ca':'#505050' }" href="#" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">Tools</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdown">
+              <li><router-link class="routerLink" to="/systeminfo" @click="setToolActiveClass(true)">System Info</router-link></li>
+              <li><router-link class="routerLink" to="/logs" @click="setToolActiveClass(true)">Logs</router-link></li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -23,30 +27,29 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
+
 export default {
     name: "NavBar",
-    data() {
-        return{
-            isActiveProcess: true,
-            isActiveCalibration: false,
-            isActiveSystemInfo: false,
+    setup(){
+        let isToolActive = ref(false);
+        let isShowDropdownActive = ref(false);
+
+        let setToolActiveClass = (isToolsLink) => {
+          if(isToolsLink === true){
+            isToolActive.value = true;
+            isShowDropdownActive.value = false;
+          }
+          else{
+            isToolActive.value = false;
+            isShowDropdownActive.value = false;
+          }
         }
-    },
-    methods: {
-        activedProcess(){
-            this.isActiveProcess = true
-            this.isActiveCalibration = false
-            this.isActiveSystemInfo = false
-        },
-        activedCalibration(){
-            this.isActiveProcess = false
-            this.isActiveCalibration = true
-            this.isActiveSystemInfo = false
-        },
-        activedSystemInfo(){
-            this.isActiveProcess = false
-            this.isActiveCalibration = false
-            this.isActiveSystemInfo = true
+
+        return{
+          isToolActive,
+          isShowDropdownActive,
+          setToolActiveClass,
         }
     }
 }

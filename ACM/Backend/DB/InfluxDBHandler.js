@@ -4,7 +4,7 @@
 const {InfluxDB, Point} = require('@influxdata/influxdb-client');
 const {hostname} = require('os');
 
-const logger = require('../Logs/logger');
+//const logger = require('../Logs/logger');
 
 
 class InfluxDBHandler {
@@ -36,7 +36,7 @@ class InfluxDBHandler {
     addWriteAPI(buckets){
         buckets.forEach(bucket => {
             let writeAPI = this.dbClient.getWriteApi(this.org, bucket);
-            logger.info(`Influx ${bucket} bucket API available.`);
+            console.log(`INFO: Influx ${bucket} bucket API available.`);
 
             this.writeAPI[bucket] = writeAPI;  
         });
@@ -50,7 +50,7 @@ class InfluxDBHandler {
     close = async (buckets) => {
         await Promise.all(buckets.map(async bucket => {
             await this.writeAPI[bucket].close();
-            logger.info(`InfluxDB ${bucket} bucket closed.`);
+            console.log(`INFO: InfluxDB ${bucket} bucket closed.`);
         }));
     }
 }

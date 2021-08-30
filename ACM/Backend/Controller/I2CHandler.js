@@ -6,7 +6,7 @@
 
 const i2c = require('i2c-bus');
 const ADS1115 = require('ads1115');
-const logger = require('../Logs/logger');
+//const logger = require('../Logs/logger');
 
 // Registers
 const I2C_BUS_NUMBER = 1;
@@ -37,7 +37,7 @@ class I2CHandler {
 
     async close(){
         this.bus.closeSync();
-        logger.info('I2C closed.');
+        console.log('INFO: I2C closed.');
     };
 
     readWord(cmd, done){
@@ -120,10 +120,10 @@ class I2CHandler {
 
         i2c1.sendByte(RELAY_ADDRESS, newState, function(err){
             if(err){
-                logger.error('Error sending byte to relay i2c: ' + err);
+                console.error('ERROR: Error sending byte to relay i2c: ' + err);
             }
             else{
-                logger.info(`Relay state changed to: ${newState}`);
+                console.log(`INFO: Relay state changed to: ${newState}`);
             }
         });
     }

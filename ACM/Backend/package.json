@@ -19,6 +19,7 @@
     "i2c-bus": "^5.2.2",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.1.1",
+    "read-last-lines": "^1.8.0",
     "simple-json-db": "^1.2.3",
     "socket.io": "^4.1.3",
     "systeminformation": "^5.8.6",

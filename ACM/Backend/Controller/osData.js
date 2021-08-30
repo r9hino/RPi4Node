@@ -1,6 +1,5 @@
 const si = require('systeminformation');
 const process = require('process');
-const logger = require('../Logs/logger');
 
 const getStaticData = async () => {
     try {
@@ -27,7 +26,7 @@ const getStaticData = async () => {
         return staticSystemData;
     }
     catch(e){
-        logger.error(e);
+        console.error('ERROR:', e);
     }
 };
 
@@ -82,7 +81,7 @@ const getDynamicData = async () => {
         return dynamicSystemData;
     }
     catch(e){
-        logger.error(e);
+        console.error('ERROR:', e);
     }
 };
 

@@ -19,7 +19,7 @@ const SensorMonitor = require('./Controller/SensorMonitor');
 const MongoDBHandler = require('./DB/MongoDBHandler');
 const InfluxDBHandler = require('./DB/InfluxDBHandler');
 const app = require('./ExpressApp/app');
-const logger = require('./Logs/logger');
+//const logger = require('./Logs/logger');
 
 // Environment variables.
 require('dotenv').config();
@@ -54,13 +54,13 @@ const initializationFunctionList = [
         // If there are no entries on the local database, go to remote MongoDB to retrieve it.
         if(Object.keys(deviceMetadata).length === 0){
             try{
-                logger.info('Connecting to remote MongoDB...');
+                console.log('INFO: Connecting to remote MongoDB...');
                 await remoteMongoDB.connectDB();
-                logger.info('Retrieving device metadata from remote MongoDB...');
+                console.log('INFO: Retrieving device metadata from remote MongoDB...');
                 deviceMetadata = await remoteMongoDB.getDeviceMetadata(hostname());
             }
             catch(e){
-                logger.error('Error, device metadata was not retrieved from remote MongoDB. Exiting Node server...');
+                console.error('ERROR: device metadata was not retrieved from remote MongoDB. Exiting Node server...');
                 process.send('STOP');
             }
         }
@@ -76,22 +76,22 @@ const initializationFunctionList = [
         deviceMetadata = Object.assign(deviceMetadata, newValuesToStore);
         deviceMetadataDB.JSON(deviceMetadata);
         deviceMetadataDB.sync();
-        logger.info('New OS and system values stored locally');
+        console.log('INFO: New OS and system values stored locally');
 
         // Store remotely new values retrieved from the OS and system.
         try{
             if(remoteMongoDB.isConnected() === false) await remoteMongoDB.connectDB();
             await remoteMongoDB.updateDevice(hostname(), newValuesToStore);
-            logger.info('New OS and system values stored remotely.');
+            console.log('INFO: New OS and system values stored remotely.');
             await remoteMongoDB.close();
         }
         catch(e){
-            logger.warn('Warning, couldn\'t store new OS and system values in the remote MongoDB.');
+            console.log('WANRING: Couldn\'t store new OS and system values in the remote MongoDB.');
         };
     },
     // Initialize http server and socket.io.
     async () => {
-        httpServer = http.createServer(app).listen(socketioPort, () => logger.info(`HTTP server for socket.io is listening on port ${socketioPort}`));
+        httpServer = http.createServer(app).listen(socketioPort, () => console.log(`INFO: HTTP server for socket.io is listening on port ${socketioPort}`));
         io = socketio(httpServer, {cors: true});
         io.on("connection", socketCoordinator);
     },
@@ -119,7 +119,7 @@ const tenSecFunction = async () => {
 };
 
 const minuteFunction = async () => {
-    logger.debug(`Temperature average is:' ${temperatureSensor.average()}    ${temperatureSensor.values}`);
+    //console.log(`DEBUG: Average temperature: ${temperatureSensor.average().toFixed(1)}    ${temperatureSensor.values}`);
     localInfluxDB.writeData(sensorBucket, temperatureSensor.sensorType, temperatureSensor.unit, temperatureSensor.average());
     //console.log(localInfluxDB.writeAPI[sensorBucket].writeBuffer);
     //console.log(localInfluxDB.writeAPI[sensorBucket].retryBuffer);
@@ -127,8 +127,8 @@ const minuteFunction = async () => {
 
 // Coordinate data through sockets.
 function socketCoordinator(socket){
-    remoteMongoDB.connectDB().catch((e) => logger.warn('Couldn\'t connect to remote MongoDB at starting of socket connection.'));
-    logger.info(`Client connected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
+    remoteMongoDB.connectDB().catch((e) => console.log('WARNING: Couldn\'t connect to remote MongoDB at starting of socket connection.'));
+    console.log(`INFO: Client connected  -  IP ${socket.request.connection.remoteAddress.split(':')[3]}  -  Client(s) ${io.engine.clientsCount}`);
 
     if(dynamicDataInterval) clearInterval(dynamicDataInterval);
 
@@ -157,11 +157,14 @@ function socketCoordinator(socket){
         socket.broadcast.emit('updateClients', relay);
         let idRelay = relay.id;
         let relayState = relay.state;
+        let dateUpdate = new Date().toString();
         let relays = deviceMetadataDB.get('relays');
         relays[idRelay].state = relayState;
+        relays[idRelay].date_update = dateUpdate;
 
-        // Store locally new state.
+        // Store new state on the local DB.
         deviceMetadataDB.set('relays', relays);
+        deviceMetadataDB.set('date_update', dateUpdate);
         deviceMetadataDB.sync();
 
         // Store remotely new state.
@@ -171,21 +174,21 @@ function socketCoordinator(socket){
                 // So local DB is loaded and then uploaded completely to the remote DB.
                 const deviceMetadata = deviceMetadataDB.JSON();
                 delete deviceMetadata["_id"];   // _id is inmutable and can not be updated.
-                remoteMongoDB.updateDevice(hostname(), deviceMetadata).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'))
+                remoteMongoDB.updateDevice(hostname(), deviceMetadata).catch(e => console.log('WARNING: Couldn\'t update relay state on remote MongoDB'))
             });
         }
-        else remoteMongoDB.updateRelayState(hostname(), idRelay, relayState).catch(e => logger.warn('Couldn\'t update relay state on remote MongoDB'));
+        else remoteMongoDB.updateRelayState(hostname(), idRelay, relayState, dateUpdate).catch(e => console.log('WARNING: Couldn\'t update relay state on remote MongoDB'));
     });
 
     socket.on('disconnect', () => {
-        logger.info(`Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
+        console.log(`INFO: Client disconnected  -  IP ${socket.request.connection.remoteAddress.split(":")[3]}  -  Client(s) ${io.engine.clientsCount}`);
         if(io.engine.clientsCount === 0) clearInterval(dynamicDataInterval);
         remoteMongoDB.close();
     });
 }
 
 async function shutdownServer(){
-    logger.info("Shuting down the server...");
+    console.log('INFO: Shuting down the server...');
     clearInterval(tenSecInterval);
     clearInterval(minuteInterval);
     clearInterval(dynamicDataInterval);
@@ -196,15 +199,15 @@ async function shutdownServer(){
         await remoteMongoDB.close();
 
         io.close(() => {
-            logger.info('Socket.io closed.');
+            console.log('INFO: Socket.io closed.');
             httpServer.close(() => {
-                logger.info('HTTP server closed.')
+                console.log('INFO: HTTP server closed.')
                 process.exit(0);
             });
         });
     }
     catch(error){
-        logger.error('Error: ', error);
+        console.error('ERROR: ', error);
         process.exit(0);
     }
 }

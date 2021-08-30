@@ -12,9 +12,9 @@
 # 6. npm i -g pm2
 
 cd Backend
-pm2 start server.js --output ./Logs/info.log --error ./Logs/error.log
+pm2 start server.js --output ./Logs/info.log --error ./Logs/error.log --time --restart-delay 3000
 
 cd ../Frontend
-pm2 start "npm run serve" --name vue-client --output ../Backend/Logs/vue-client-out.log --error ../Backend/Logs/vue-client-error.log
+pm2 start "npm run serve" --name vue-client --output ../Backend/Logs/vue-client-out.log --error ../Backend/Logs/vue-client-error.log --timestamp --restart-delay 3000
 
 cd ..
